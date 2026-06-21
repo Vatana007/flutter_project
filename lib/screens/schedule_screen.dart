@@ -4,9 +4,7 @@ import 'package:project_flutter/services/api_service.dart';
 import 'package:project_flutter/models/schedule_item.dart';
 
 class ScheduleScreen extends StatefulWidget {
-  final AppState appState;
-
-  const ScheduleScreen({super.key, required this.appState});
+  const ScheduleScreen({super.key});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -43,7 +41,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = widget.appState.translate('error_loading');
+        _errorMessage = context.appState.translate('error_loading');
         _isLoading = false;
       });
     }
@@ -51,7 +49,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.appState.isDarkMode;
+    final appState = context.appState;
+    final isDark = appState.isDarkMode;
+    final theme = Theme.of(context);
     
     // Filter schedules based on active selected day
     final filteredSchedule = _allSchedules.where((item) => item.day == _selectedDay).toList();
@@ -75,7 +75,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 padding: const EdgeInsets.only(right: 10.0),
                 child: ChoiceChip(
                   label: Text(
-                    widget.appState.translate(day.toLowerCase()).isEmpty
+                    appState.translate(day.toLowerCase()).isEmpty
                         ? day
                         : day.substring(0, 3), // e.g. Mon, Tue
                     style: TextStyle(
@@ -86,7 +86,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     ),
                   ),
                   selected: isSelected,
-                  selectedColor: const Color(0xFF4F46E5),
+                  selectedColor: theme.primaryColor,
                   backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: isSelected ? 4 : 0,
@@ -107,7 +107,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: _fetchScheduleData,
-            color: const Color(0xFF4F46E5),
+            color: theme.primaryColor,
             child: _buildBody(filteredSchedule, isDark),
           ),
         ),
@@ -116,14 +116,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildBody(List<ScheduleItem> schedules, bool isDark) {
+    final theme = Theme.of(context);
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Color(0xFF4F46E5)),
-            SizedBox(height: 16),
-            Text(
+            CircularProgressIndicator(color: theme.primaryColor),
+            const SizedBox(height: 16),
+            const Text(
               'Fetching academic timetable...',
               style: TextStyle(fontWeight: FontWeight.w500),
             )
@@ -150,12 +151,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               ElevatedButton.icon(
                 onPressed: _fetchScheduleData,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: theme.primaryColor,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 icon: const Icon(Icons.refresh_rounded),
-                label: Text(widget.appState.translate('retry')),
+                label: Text(context.appState.translate('retry')),
               ),
             ],
           ),
@@ -173,13 +174,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : Colors.indigo.withOpacity(0.05),
+                  color: isDark ? const Color(0xFF1E293B) : theme.primaryColor.withOpacity(0.08),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.weekend_rounded,
                   size: 50,
-                  color: isDark ? const Color(0xFF94A3B8) : Colors.indigo.shade400,
+                  color: isDark ? const Color(0xFF94A3B8) : theme.primaryColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -216,6 +217,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildScheduleCard(ScheduleItem item, bool isDark) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -227,7 +229,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.black26 : Colors.indigo.withOpacity(0.02),
+            color: isDark ? Colors.black26 : theme.primaryColor.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -261,14 +263,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.access_time_filled_rounded, size: 16, color: Color(0xFF4F46E5)),
+                            Icon(Icons.access_time_filled_rounded, size: 16, color: theme.primaryColor),
                             const SizedBox(width: 6),
                             Text(
                               '${item.startTime} - ${item.endTime}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4F46E5),
+                                color: theme.primaryColor,
                               ),
                             ),
                           ],
@@ -310,7 +312,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                        color: theme.primaryColor,
                       ),
                     ),
                     const Padding(
@@ -359,7 +361,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Color _getCardIndicatorColor(String id) {
     final index = int.tryParse(id) ?? 0;
     const colors = [
-      Color(0xFF6366F1), // Indigo
+      Color(0xFF0D9488), // Teal
       Color(0xFF10B981), // Emerald
       Color(0xFFEC4899), // Pink
       Color(0xFFF59E0B), // Amber

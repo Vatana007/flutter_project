@@ -3,13 +3,13 @@ import 'package:project_flutter/services/app_state.dart';
 import 'package:project_flutter/models/notification.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  final AppState appState;
-
-  const NotificationsScreen({super.key, required this.appState});
+  const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.appState;
     final isDark = appState.isDarkMode;
+    final theme = Theme.of(context);
 
     return ListenableBuilder(
       listenable: appState,
@@ -17,15 +17,11 @@ class NotificationsScreen extends StatelessWidget {
         final notificationsList = appState.notifications;
 
         return Scaffold(
-          backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
           appBar: AppBar(
-            elevation: 0,
-            backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
             centerTitle: true,
             title: Text(
               appState.translate('notifications'),
-              style: TextStyle(
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -33,7 +29,7 @@ class NotificationsScreen extends StatelessWidget {
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: isDark ? Colors.indigo.shade300 : const Color(0xFF4F46E5),
+                color: theme.primaryColor,
                 size: 20,
               ),
               onPressed: () => Navigator.pop(context),
@@ -44,16 +40,24 @@ class NotificationsScreen extends StatelessWidget {
                   tooltip: 'Mark all as read',
                   icon: Icon(
                     Icons.done_all_rounded,
-                    color: isDark ? Colors.indigo.shade300 : const Color(0xFF4F46E5),
+                    color: theme.primaryColor,
                     size: 22,
                   ),
                   onPressed: () {
                     appState.markAllNotificationsAsRead();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('All notifications marked as read.'),
-                        backgroundColor: Color(0xFF10B981),
-                        duration: Duration(milliseconds: 1500),
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(Icons.check_circle_outline_rounded, color: Colors.white),
+                            SizedBox(width: 12),
+                            Expanded(child: Text('All notifications marked as read.')),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xFF0D9488),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        duration: const Duration(milliseconds: 1500),
                       ),
                     );
                   },
@@ -62,14 +66,14 @@ class NotificationsScreen extends StatelessWidget {
             ],
           ),
           body: notificationsList.isEmpty
-              ? _buildEmptyState(isDark)
+              ? _buildEmptyState(theme, isDark, appState)
               : ListView.builder(
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   itemCount: notificationsList.length,
                   itemBuilder: (context, index) {
                     final notif = notificationsList[index];
-                    return _buildNotificationCard(context, notif, isDark);
+                    return _buildNotificationCard(context, notif, theme, isDark, appState);
                   },
                 ),
         );
@@ -77,7 +81,7 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState(ThemeData theme, bool isDark, AppState appState) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -85,13 +89,13 @@ class NotificationsScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.indigo.withOpacity(0.05),
+              color: isDark ? const Color(0xFF1E293B) : theme.primaryColor.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.notifications_off_outlined,
-              size: 50,
-              color: isDark ? const Color(0xFF94A3B8) : Colors.indigo.shade400,
+              size: 56,
+              color: isDark ? const Color(0xFF94A3B8) : theme.primaryColor,
             ),
           ),
           const SizedBox(height: 20),
@@ -108,11 +112,12 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationCard(BuildContext context, AppNotification notif, bool isDark) {
+  Widget _buildNotificationCard(BuildContext context, AppNotification notif, ThemeData theme, bool isDark, AppState appState) {
     final isUnread = !notif.isRead;
     
-    // Theme conditional colors
-    final unreadColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFEEF2FF);
+    final unreadColor = isDark 
+        ? theme.primaryColor.withOpacity(0.12) 
+        : theme.primaryColor.withOpacity(0.06);
     final readColor = isDark ? const Color(0xFF0F172A) : Colors.white;
     final titleColor = isDark ? Colors.white : const Color(0xFF1E293B);
     final subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569);
@@ -122,7 +127,7 @@ class NotificationsScreen extends StatelessWidget {
         if (isUnread) {
           appState.markNotificationAsRead(notif.id);
         }
-        _showNotificationDetailDialog(context, notif);
+        _showNotificationDetailDialog(context, notif, appState);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -130,7 +135,7 @@ class NotificationsScreen extends StatelessWidget {
           color: isUnread ? unreadColor : readColor,
           border: Border(
             bottom: BorderSide(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
               width: 1,
             ),
           ),
@@ -144,13 +149,13 @@ class NotificationsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: isUnread 
-                    ? const Color(0xFF4F46E5).withOpacity(0.15)
+                    ? theme.primaryColor.withOpacity(0.18)
                     : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isUnread ? Icons.mark_email_unread_rounded : Icons.drafts_rounded,
-                color: isUnread ? const Color(0xFF4F46E5) : Colors.grey,
+                color: isUnread ? theme.primaryColor : Colors.grey,
                 size: 18,
               ),
             ),
@@ -187,7 +192,7 @@ class NotificationsScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                     ),
                   ),
                 ],
@@ -211,8 +216,9 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  void _showNotificationDetailDialog(BuildContext context, AppNotification notif) {
+  void _showNotificationDetailDialog(BuildContext context, AppNotification notif, AppState appState) {
     final isDark = appState.isDarkMode;
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -223,7 +229,7 @@ class NotificationsScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.campaign_rounded, color: Color(0xFF4F46E5)),
+                Icon(Icons.campaign_rounded, color: theme.primaryColor),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -237,13 +243,13 @@ class NotificationsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               notif.timestamp,
               style: TextStyle(
                 fontSize: 11,
                 color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -259,9 +265,9 @@ class NotificationsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Close',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold, color: theme.primaryColor),
             ),
           ),
         ],

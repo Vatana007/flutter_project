@@ -3,14 +3,14 @@ import 'package:project_flutter/services/app_state.dart';
 import 'package:project_flutter/widgets/custom_text_field.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final AppState appState;
-
-  const ProfileScreen({super.key, required this.appState});
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.appState;
     final student = appState.currentStudent;
     final isDark = appState.isDarkMode;
+    final theme = Theme.of(context);
 
     if (student == null) return const SizedBox();
 
@@ -23,80 +23,138 @@ class ProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              // Profile Photo Header
-              Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF4F46E5),
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF4F46E5).withOpacity(0.15),
-                            blurRadius: 20,
-                            spreadRadius: 2,
-                          )
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 60,
-                        backgroundImage: NetworkImage(currentStudent.avatarUrl),
-                        backgroundColor: Colors.indigo.shade50,
-                      ),
+              // Virtual Student Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                        : [theme.primaryColor, theme.primaryColor.withOpacity(0.85)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryColor.withOpacity(isDark ? 0.25 : 0.15),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF4F46E5),
-                          shape: BoxShape.circle,
+                  ],
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.12),
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Card Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.school_rounded, color: Colors.white, size: 24),
+                            const SizedBox(width: 8),
+                            Text(
+                              'STUDENT CARD',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.camera_alt_rounded,
-                          color: Colors.white,
-                          size: 20,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'ACTIVE',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Photo & Basics
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: CircleAvatar(
+                            radius: 44,
+                            backgroundImage: NetworkImage(currentStudent.avatarUrl),
+                            backgroundColor: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                currentStudent.name,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                currentStudent.major,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${appState.translate('student_id')}: ${currentStudent.id}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 28),
               
-              // Full Name & ID
-              Text(
-                currentStudent.name,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${appState.translate('student_id')}: ${currentStudent.id}',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.indigo.shade300 : Colors.indigo.shade600,
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Detailed info cards list
+              // Detailed info list
               Container(
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                    width: 1,
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                    width: 1.2,
                   ),
                 ),
                 child: Column(
@@ -106,31 +164,35 @@ class ProfileScreen extends StatelessWidget {
                       label: appState.translate('major'),
                       value: currentStudent.major,
                       isDark: isDark,
-                      isFirst: true,
+                      primaryColor: theme.primaryColor,
                     ),
                     _buildInfoTile(
                       icon: Icons.calendar_today_rounded,
                       label: appState.translate('academic_year'),
                       value: currentStudent.academicYear,
                       isDark: isDark,
+                      primaryColor: theme.primaryColor,
                     ),
                     _buildInfoTile(
                       icon: Icons.email_rounded,
                       label: 'Email',
                       value: currentStudent.email,
                       isDark: isDark,
+                      primaryColor: theme.primaryColor,
                     ),
                     _buildInfoTile(
                       icon: Icons.phone_rounded,
                       label: appState.translate('phone_number'),
                       value: currentStudent.phoneNumber,
                       isDark: isDark,
+                      primaryColor: theme.primaryColor,
                     ),
                     _buildInfoTile(
                       icon: Icons.star_rate_rounded,
                       label: 'Current GPA',
                       value: currentStudent.gpa.toStringAsFixed(2),
                       isDark: isDark,
+                      primaryColor: theme.primaryColor,
                       isLast: true,
                     ),
                   ],
@@ -141,17 +203,17 @@ class ProfileScreen extends StatelessWidget {
               // Edit Profile Button
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 56,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
+                    backgroundColor: theme.primaryColor,
                     foregroundColor: Colors.white,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 1,
                   ),
-                  onPressed: () => _showEditProfileSheet(context),
+                  onPressed: () => _showEditProfileSheet(context, appState),
                   icon: const Icon(Icons.edit_rounded, size: 18),
                   label: Text(
                     appState.translate('edit_profile'),
@@ -171,7 +233,7 @@ class ProfileScreen extends StatelessWidget {
     required String label,
     required String value,
     required bool isDark,
-    bool isFirst = false,
+    required Color primaryColor,
     bool isLast = false,
   }) {
     return Container(
@@ -181,25 +243,26 @@ class ProfileScreen extends StatelessWidget {
             ? null
             : Border(
                 bottom: BorderSide(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                  width: 1.5,
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  width: 1.2,
                 ),
               ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF4F46E5), size: 22),
+          Icon(icon, color: primaryColor, size: 22),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
+                  label.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                     color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -207,7 +270,7 @@ class ProfileScreen extends StatelessWidget {
                   value,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                 ),
@@ -219,7 +282,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showEditProfileSheet(BuildContext context) {
+  void _showEditProfileSheet(BuildContext context, AppState appState) {
     final student = appState.currentStudent!;
     final nameController = TextEditingController(text: student.name);
     final phoneController = TextEditingController(text: student.phoneNumber);
@@ -231,6 +294,7 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) {
         final isDark = appState.isDarkMode;
+        final theme = Theme.of(context);
         return Container(
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E293B) : Colors.white,
@@ -254,7 +318,7 @@ class ProfileScreen extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -304,7 +368,10 @@ class ProfileScreen extends StatelessWidget {
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         appState.translate('cancel'),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        ),
                       ),
                     ),
                   ),
@@ -312,7 +379,7 @@ class ProfileScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
+                        backgroundColor: theme.primaryColor,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -329,8 +396,16 @@ class ProfileScreen extends StatelessWidget {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(appState.translate('profile_updated')),
-                              backgroundColor: const Color(0xFF10B981),
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle_outline_rounded, color: Colors.white),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(appState.translate('profile_updated'))),
+                                ],
+                              ),
+                              backgroundColor: const Color(0xFF0D9488),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           );
                         }

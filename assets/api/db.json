@@ -1,0 +1,331 @@
+{
+  "student": {
+    "id": "DUC2024-0001",
+    "name": "Vuth Vatana",
+    "email": "vatana@gmail.com",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+    "major": "Software Development",
+    "academicYear": "Year 3, Semester 2",
+    "phoneNumber": "+855 89 777 666",
+    "gpa": 3.82,
+    "attendanceRate": 0.94
+  },
+  "notifications": [
+    {
+      "id": 1,
+      "title": "Welcome to Semester II Academic Year 2026",
+      "message": "Welcome back students! Classes for Semester II start next Monday. Please review your schedules and ensure your registration is fully finalized.",
+      "timestamp": "Just now",
+      "isRead": false
+    },
+    {
+      "id": 2,
+      "title": "Midterm Examination Timetable Released",
+      "message": "The official midterm exam schedule has been posted on the main portal. Exams will commence from the 25th of this month. Good luck to everyone!",
+      "timestamp": "2 hours ago",
+      "isRead": false
+    },
+    {
+      "id": 3,
+      "title": "Scholarship Program Applications Open",
+      "message": "Undergraduate students with a GPA higher than 3.5 are invited to apply for the prestigious ASEAN Excellence Scholarship. Application deadline is June 30th.",
+      "timestamp": "1 day ago",
+      "isRead": false
+    },
+    {
+      "id": 4,
+      "title": "Library Opening Hours Extended for Finals",
+      "message": "To support students during exam preparation, the central library will be open 24/7 starting from next week until the end of the final exam cycle.",
+      "timestamp": "4 days ago",
+      "isRead": true
+    },
+    {
+      "id": 5,
+      "title": "Guest Lecture: AI Trends by Google Engineer",
+      "message": "Join us at Room 403 on Friday at 2:00 PM for an exciting presentation by a Google Senior Software Engineer discussing future trends in Large Language Models.",
+      "timestamp": "6 days ago",
+      "isRead": true
+    }
+  ],
+  "schedule": [
+    {
+      "id": "1",
+      "day": "Monday",
+      "startTime": "08:00 AM",
+      "endTime": "11:00 AM",
+      "subject": {
+        "code": "CS-301",
+        "name": "Mobile Application Development",
+        "lecturer": "Dr. Kim Sour",
+        "credits": 4,
+        "room": "Lab Room 101",
+        "time": "08:00 AM - 11:00 AM",
+        "day": "Monday"
+      }
+    },
+    {
+      "id": "2",
+      "day": "Monday",
+      "startTime": "01:00 PM",
+      "endTime": "04:00 PM",
+      "subject": {
+        "code": "CS-302",
+        "name": "Advanced Database Systems",
+        "lecturer": "Dr. Linda Chen",
+        "credits": 3,
+        "room": "Lab Room 102",
+        "time": "01:00 PM - 04:00 PM",
+        "day": "Monday"
+      }
+    },
+    {
+      "id": "3",
+      "day": "Tuesday",
+      "startTime": "08:00 AM",
+      "endTime": "11:00 AM",
+      "subject": {
+        "code": "CS-303",
+        "name": "UX/UI Interface Design",
+        "lecturer": "Prof. Alex Vance",
+        "credits": 3,
+        "room": "Seminar Room A",
+        "time": "08:00 AM - 11:00 AM",
+        "day": "Tuesday"
+      }
+    },
+    {
+      "id": "4",
+      "day": "Wednesday",
+      "startTime": "01:00 PM",
+      "endTime": "04:00 PM",
+      "subject": {
+        "code": "CS-304",
+        "name": "Software Engineering Methodology",
+        "lecturer": "Dr. David Miller",
+        "credits": 4,
+        "room": "Lecture Hall 2",
+        "time": "01:00 PM - 04:00 PM",
+        "day": "Wednesday"
+      }
+    },
+    {
+      "id": "5",
+      "day": "Thursday",
+      "startTime": "08:00 AM",
+      "endTime": "11:00 AM",
+      "subject": {
+        "code": "CS-305",
+        "name": "Cloud Architecture & Web Services",
+        "lecturer": "Prof. Sophia Martinez",
+        "credits": 3,
+        "room": "Lab Room 104",
+        "time": "08:00 AM - 11:00 AM",
+        "day": "Thursday"
+      }
+    },
+    {
+      "id": "6",
+      "day": "Friday",
+      "startTime": "09:00 AM",
+      "endTime": "12:00 PM",
+      "subject": {
+        "code": "CS-306",
+        "name": "Information Security & Cryptography",
+        "lecturer": "Dr. Kim Sour",
+        "credits": 4,
+        "room": "Lab Room 101",
+        "time": "09:00 AM - 12:00 PM",
+        "day": "Friday"
+      }
+    }
+  ],
+  "grades": [
+    {
+      "subjectCode": "CS-201",
+      "subjectName": "Data Structures & Algorithms",
+      "credits": 4,
+      "gradeLetter": "A",
+      "gpaValue": 4.0,
+      "score": 92.5,
+      "semester": "Year 2, Semester 2"
+    },
+    {
+      "subjectCode": "CS-202",
+      "subjectName": "Computer Network Protocols",
+      "credits": 3,
+      "gradeLetter": "A",
+      "gpaValue": 4.0,
+      "score": 90.0,
+      "semester": "Year 2, Semester 2"
+    },
+    {
+      "subjectCode": "CS-203",
+      "subjectName": "Discrete Mathematics II",
+      "credits": 3,
+      "gradeLetter": "B+",
+      "gpaValue": 3.5,
+      "score": 86.8,
+      "semester": "Year 2, Semester 2"
+    },
+    {
+      "subjectCode": "CS-204",
+      "subjectName": "Operating Systems & Kernel Dev",
+      "credits": 4,
+      "gradeLetter": "B",
+      "gpaValue": 3.0,
+      "score": 82.2,
+      "semester": "Year 2, Semester 2"
+    },
+    {
+      "subjectCode": "CS-205",
+      "subjectName": "Human-Computer Interaction",
+      "credits": 3,
+      "gradeLetter": "A",
+      "gpaValue": 4.0,
+      "score": 94.0,
+      "semester": "Year 2, Semester 2"
+    }
+  ],
+  "assignments": [
+    {
+      "id": "1",
+      "title": "Flutter Navigation & State App",
+      "subjectCode": "CS-301",
+      "dueDate": "June 18, 2026",
+      "description": "Create a fully functional Multi-Tab Flutter application showcasing advanced InheritedWidget state management, localized strings, custom themes, and RESTful dynamic fetching.",
+      "status": "pending",
+      "priority": "high",
+      "maxScore": 100.0
+    },
+    {
+      "id": "2",
+      "title": "Normalized Schema Design",
+      "subjectCode": "CS-302",
+      "dueDate": "June 20, 2026",
+      "description": "Normalize a complex multi-table dataset from 1NF to 3NF/BCNF. Write SQL scripts demonstrating data constraints, indices, and view creation.",
+      "status": "pending",
+      "priority": "medium",
+      "maxScore": 50.0
+    },
+    {
+      "id": "3",
+      "title": "User Persona Research & Mockups",
+      "subjectCode": "CS-303",
+      "dueDate": "June 14, 2026",
+      "description": "Perform user interviews for a school dashboard app, map user journeys, and construct high-fidelity interactive Figma mockups.",
+      "status": "submitted",
+      "priority": "low",
+      "maxScore": 100.0
+    },
+    {
+      "id": "4",
+      "title": "SRS Requirements Document",
+      "subjectCode": "CS-304",
+      "dueDate": "June 08, 2026",
+      "description": "Write a complete Software Requirements Specification (SRS) document for a clinic booking system under IEEE standards.",
+      "status": "graded",
+      "priority": "high",
+      "score": 92.0,
+      "maxScore": 100.0
+    },
+    {
+      "id": "5",
+      "title": "Docker Setup & CI/CD Pipeline",
+      "subjectCode": "CS-305",
+      "dueDate": "June 05, 2026",
+      "description": "Dockerize a Node.js API and setup a GitHub Actions pipeline deploying it automatically to AWS Elastic Beanstalk.",
+      "status": "graded",
+      "priority": "medium",
+      "score": 48.0,
+      "maxScore": 50.0
+    }
+  ],
+  "attendance": [
+    {
+      "subjectCode": "CS-301",
+      "subjectName": "Mobile Application Development",
+      "presentDays": 14,
+      "totalDays": 15
+    },
+    {
+      "subjectCode": "CS-302",
+      "subjectName": "Advanced Database Systems",
+      "presentDays": 15,
+      "totalDays": 15
+    },
+    {
+      "subjectCode": "CS-303",
+      "subjectName": "UX/UI Interface Design",
+      "presentDays": 12,
+      "totalDays": 15
+    },
+    {
+      "subjectCode": "CS-304",
+      "subjectName": "Software Engineering Methodology",
+      "presentDays": 15,
+      "totalDays": 15
+    },
+    {
+      "subjectCode": "CS-305",
+      "subjectName": "Cloud Architecture & Web Services",
+      "presentDays": 13,
+      "totalDays": 15
+    },
+    {
+      "subjectCode": "CS-306",
+      "subjectName": "Information Security & Cryptography",
+      "presentDays": 15,
+      "totalDays": 15
+    }
+  ],
+  "campus_news": [
+    {
+      "id": "1",
+      "title": "Annual Campus Tech Hackathon 2026",
+      "category": "sports",
+      "content": "Get ready for 48 hours of pure coding, design, and innovation! Build a solution tackling 'Sustainable Cities' and win over $3,000 in grand prizes. Mentorship from industry experts will be provided throughout the event.",
+      "imageUrl": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=500",
+      "date": "June 26 - 28, 2026",
+      "rsvpCount": 142,
+      "isRegistered": false
+    },
+    {
+      "id": "2",
+      "title": "Inter-University Basketball Championship",
+      "category": "sports",
+      "content": "Support our school team in the upcoming finals match against National Tech University at our main sports arena! Entry is free for all students. Free jerseys will be distributed at the gate for the first 100 supporters.",
+      "imageUrl": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500",
+      "date": "June 19, 2026",
+      "rsvpCount": 89,
+      "isRegistered": false
+    },
+    {
+      "id": "3",
+      "title": "Seminar: DevOps & Cloud Architecture",
+      "category": "workshop",
+      "content": "Join AWS Certified Architect Sophia Martinez in this hands-on workshop covering cloud-native microservices, serverless deployments, Kubernetes setup, and modern DevOps pipelines.",
+      "imageUrl": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500",
+      "date": "July 02, 2026",
+      "rsvpCount": 54,
+      "isRegistered": false
+    }
+  ],
+  "borrowed_books": [
+    {
+      "bookKey": "/works/OL1845124W",
+      "title": "Introduction to Algorithms",
+      "authors": ["Thomas H. Cormen", "Charles E. Leiserson"],
+      "borrowDate": "June 01, 2026",
+      "dueDate": "June 15, 2026",
+      "status": "active"
+    },
+    {
+      "bookKey": "/works/OL27479W",
+      "title": "Clean Code",
+      "authors": ["Robert C. Martin"],
+      "borrowDate": "May 10, 2026",
+      "dueDate": "May 24, 2026",
+      "status": "returned"
+    }
+  ]
+}

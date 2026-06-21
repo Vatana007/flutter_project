@@ -15,9 +15,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+
   final AuthService _authService = AuthService();
-  
+
   String? _emailError;
   String? _passwordError;
   bool _isLoading = false;
@@ -51,20 +51,40 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final student = await _authService.login(email, password);
       appState.loginStudent(student);
-      
+
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => MainScreen(appState: appState),
-          ),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       }
     } catch (e) {
       if (mounted) {
+        final isInvalidLogin = e.toString().contains('invalid_login');
+        final errorMessage = isInvalidLogin
+            ? 'Account not found or password is incorrect.'
+            : appState.translate('error_loading');
+
+        if (isInvalidLogin) {
+          setState(() {
+            _emailError = 'Check your registered Gmail.';
+            _passwordError = 'Check your password.';
+          });
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(appState.translate('error_loading')),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(errorMessage)),
+              ],
+            ),
             backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -84,142 +104,188 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // In our main entry file, we will supply AppState at the root using ListenableBuilder
-    // So we can find AppState from the ancestral tree, or since we are starting from MaterialApp,
-    // we can retrieve it by looking at Main.dart's provider, or simply use context.findAncestorStateOfType or standard ListenableBuilder passdown.
-    // For simplicity and clean code, we can define an InheritedWidget or access the AppState that we pass down.
-    // Wait, let's write a static wrapper or get the instance. Let's look up how we expose AppState.
-    // We can define a global InheritedWidget named `AppStateProvider` which makes retrieving `AppState` clean and standard!
-    // Let's get the AppState from the state provider we will write in main.dart:
-    final appState = AppStateProvider.of(context);
+    final appState = context.appState;
     final isDark = appState.isDarkMode;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              // Brand logo header
-              Center(
-                child: Column(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 24.0,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Brand logo header with elegant container
+                Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.indigo.withOpacity(0.08),
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black26
+                                : theme.primaryColor.withOpacity(0.08),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF334155)
+                              : theme.primaryColor.withOpacity(0.08),
+                          width: 1.5,
+                        ),
                       ),
                       child: Icon(
                         Icons.school_rounded,
-                        size: 48,
-                        color: isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                        size: 56,
+                        color: theme.primaryColor,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     Text(
                       appState.translate('app_title'),
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
-                        letterSpacing: 0.5,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Text(
                       'Access schedules, grades, and announcements',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
+                        fontSize: 14,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 48),
-              
-              // Login Form
-              CustomTextField(
-                controller: _emailController,
-                labelText: appState.translate('email_hint'),
-                hintText: 'student@edutrack.edu.kh',
-                prefixIcon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                errorText: _emailError,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _passwordController,
-                labelText: appState.translate('password_hint'),
-                hintText: '••••••••',
-                prefixIcon: Icons.lock_outlined,
-                isPassword: true,
-                errorText: _passwordError,
-              ),
-              
-              const SizedBox(height: 12),
-              // Forgot Password link
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    _showForgotPasswordDialog(context, appState);
-                  },
-                  child: Text(
-                    appState.translate('forgot_password'),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                const SizedBox(height: 40),
+
+                // Form Card container
+                Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black38
+                            : theme.primaryColor.withOpacity(0.04),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF334155)
+                          : theme.primaryColor.withOpacity(0.05),
+                      width: 1.5,
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
-                    elevation: 2,
-                    shadowColor: const Color(0xFF4F46E5).withOpacity(0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onPressed: _isLoading ? null : () => _handleLogin(appState),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          appState.translate('login'),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomTextField(
+                        controller: _emailController,
+                        labelText: appState.translate('email_hint'),
+                        hintText: 'student@edutrack.edu.kh',
+                        prefixIcon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        errorText: _emailError,
+                      ),
+                      const SizedBox(height: 20),
+                      CustomTextField(
+                        controller: _passwordController,
+                        labelText: appState.translate('password_hint'),
+                        hintText: '••••••••',
+                        prefixIcon: Icons.lock_outlined,
+                        isPassword: true,
+                        errorText: _passwordError,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Forgot Password Link
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            _showForgotPasswordDialog(context, appState);
+                          },
+                          child: Text(
+                            appState.translate('forgot_password'),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: theme.primaryColor,
+                            ),
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Login Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryColor,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: _isLoading
+                              ? null
+                              : () => _handleLogin(appState),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  appState.translate('login'),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Register navigation
-              Center(
-                child: TextButton(
+                const SizedBox(height: 28),
+
+                // Navigation to Register
+                TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -228,17 +294,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     );
                   },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
                   child: Text(
                     appState.translate('dont_have_account'),
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.indigo.shade300 : Colors.indigo.shade600,
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -250,9 +322,14 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: appState.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-        title: Text(appState.translate('forgot_password')),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: appState.isDarkMode
+            ? const Color(0xFF1E293B)
+            : Colors.white,
+        title: Text(
+          appState.translate('forgot_password'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,18 +337,26 @@ class _LoginScreenState extends State<LoginScreen> {
             Text(
               'Enter your registered email below, and we will send instructions to reset your password.',
               style: TextStyle(
-                color: appState.isDarkMode ? Colors.grey.shade300 : Colors.grey.shade600,
+                color: appState.isDarkMode
+                    ? const Color(0xFFCBD5E1)
+                    : const Color(0xFF475569),
                 fontSize: 13,
-                height: 1.4,
+                height: 1.5,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
                 hintText: 'student@edutrack.edu.kh',
                 prefixIcon: const Icon(Icons.email_outlined),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
             ),
           ],
@@ -279,42 +364,51 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(appState.translate('cancel')),
+            child: Text(
+              appState.translate('cancel'),
+              style: TextStyle(
+                color: appState.isDarkMode
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF64748B),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Password reset link sent to your email.'),
-                  backgroundColor: Color(0xFF10B981),
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline_rounded,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text('Password reset link sent to your email.'),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: const Color(0xFF10B981),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               );
             },
-            child: const Text('Send Reset Link', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              'Send Reset Link',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-// Simple InheritedWidget to pass down AppState throughout the widget tree
-class AppStateProvider extends InheritedWidget {
-  final AppState appState;
-
-  const AppStateProvider({
-    super.key,
-    required this.appState,
-    required super.child,
-  });
-
-  static AppState of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<AppStateProvider>();
-    assert(provider != null, 'No AppStateProvider found in context');
-    return provider!.appState;
-  }
-
-  @override
-  bool updateShouldNotify(AppStateProvider oldWidget) => appState != oldWidget.appState;
 }

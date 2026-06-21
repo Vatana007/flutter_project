@@ -7,6 +7,7 @@ class Student {
   final String academicYear;
   final String phoneNumber;
   final double gpa;
+  final double attendanceRate;
 
   Student({
     required this.id,
@@ -17,6 +18,7 @@ class Student {
     required this.academicYear,
     required this.phoneNumber,
     required this.gpa,
+    required this.attendanceRate,
   });
 
   Student copyWith({
@@ -28,6 +30,7 @@ class Student {
     String? academicYear,
     String? phoneNumber,
     double? gpa,
+    double? attendanceRate,
   }) {
     return Student(
       id: id ?? this.id,
@@ -38,6 +41,7 @@ class Student {
       academicYear: academicYear ?? this.academicYear,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       gpa: gpa ?? this.gpa,
+      attendanceRate: attendanceRate ?? this.attendanceRate,
     );
   }
 
@@ -51,6 +55,21 @@ class Student {
       academicYear: json['academicYear'] ?? 'Year 3, Semester 1',
       phoneNumber: json['phoneNumber'] ?? '+855 12 345 678',
       gpa: (json['gpa'] as num?)?.toDouble() ?? 3.85,
+      attendanceRate: (json['attendanceRate'] as num?)?.toDouble() ?? 0.94,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'avatarUrl': avatarUrl,
+      'major': major,
+      'academicYear': academicYear,
+      'phoneNumber': phoneNumber,
+      'gpa': gpa,
+      'attendanceRate': attendanceRate,
+    };
   }
 }

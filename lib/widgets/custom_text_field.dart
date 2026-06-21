@@ -80,7 +80,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 widget.prefixIcon,
                 color: widget.errorText != null
                     ? Colors.redAccent
-                    : (isDark ? const Color(0xFF818CF8) : const Color(0xFF4F46E5)),
+                    : theme.primaryColor,
               ),
               suffixIcon: widget.isPassword
                   ? IconButton(

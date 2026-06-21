@@ -1,0 +1,19 @@
+{
+  "accounts": [
+    {
+      "email": "vatana@gmail.com",
+      "password": "Vatana@009",
+      "student": {
+        "id": "DUC2024-0001",
+        "name": "Vuth Vatana",
+        "email": "vatana@gmail.com",
+        "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+        "major": "Software Development",
+        "academicYear": "Year 3, Semester 2",
+        "phoneNumber": "+855 12 345 678",
+        "gpa": 4.0,
+        "attendanceRate": 1.0
+      }
+    }
+  ]
+}

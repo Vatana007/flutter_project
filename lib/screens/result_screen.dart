@@ -4,9 +4,7 @@ import 'package:project_flutter/services/api_service.dart';
 import 'package:project_flutter/models/grade.dart';
 
 class ResultScreen extends StatefulWidget {
-  final AppState appState;
-
-  const ResultScreen({super.key, required this.appState});
+  const ResultScreen({super.key});
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -22,6 +20,20 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
   late AnimationController _gpaController;
   late Animation<double> _gpaAnimation;
 
+  // GPA Target Calculator State
+  final Map<String, String> _projectedGrades = {};
+  
+  final List<Map<String, dynamic>> _currentCourses = [
+    {'code': 'CS-301', 'name': 'Mobile Application Development', 'credits': 4},
+    {'code': 'CS-302', 'name': 'Advanced Database Systems', 'credits': 3},
+    {'code': 'CS-303', 'name': 'UX/UI Interface Design', 'credits': 3},
+    {'code': 'CS-304', 'name': 'Software Engineering Methodology', 'credits': 4},
+    {'code': 'CS-305', 'name': 'Cloud Architecture & Web Services', 'credits': 3},
+    {'code': 'CS-306', 'name': 'Information Security & Cryptography', 'credits': 4},
+  ];
+
+  final List<String> _gradeOptions = ['A', 'B+', 'B', 'C+', 'C', 'D', 'F'];
+
   @override
   void initState() {
     super.initState();
@@ -31,10 +43,18 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
     );
     _gpaAnimation = Tween<double>(begin: 0, end: 0).animate(_gpaController);
     
-    _fetchGradesData();
+    // Initialize calculator projections
+    for (var course in _currentCourses) {
+      _projectedGrades[course['code'] as String] = 'A';
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchGradesData();
+    });
   }
 
   Future<void> _fetchGradesData() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -43,7 +63,6 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
     try {
       final data = await _apiService.fetchGrades();
       
-      // Calculate active GPA from fetched items
       double totalPoints = 0;
       int totalCredits = 0;
       for (var grade in data) {
@@ -53,24 +72,27 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
       
       final gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0.0;
 
-      setState(() {
-        _grades = data;
-        _isLoading = false;
+      if (mounted) {
+        setState(() {
+          _grades = data;
+          _isLoading = false;
+          
+          _gpaAnimation = Tween<double>(
+            begin: 0,
+            end: gpa,
+          ).animate(CurvedAnimation(parent: _gpaController, curve: Curves.easeOutCubic));
+        });
         
-        // Re-setup GPA animation for visual effect
-        _gpaAnimation = Tween<double>(
-          begin: 0,
-          end: gpa,
-        ).animate(CurvedAnimation(parent: _gpaController, curve: Curves.easeOutCubic));
-      });
-      
-      _gpaController.reset();
-      _gpaController.forward();
+        _gpaController.reset();
+        _gpaController.forward();
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = widget.appState.translate('error_loading');
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = context.appState.translate('error_loading');
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -80,28 +102,106 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
+  double _getGpaValueFromLetter(String letter) {
+    switch (letter) {
+      case 'A': return 4.0;
+      case 'B+': return 3.5;
+      case 'B': return 3.0;
+      case 'C+': return 2.5;
+      case 'C': return 2.0;
+      case 'D+': return 1.5;
+      case 'D': return 1.0;
+      default: return 0.0;
+    }
+  }
+
+  double _calculateProjectedTermGpa() {
+    double totalPoints = 0;
+    int totalCredits = 0;
+    for (var course in _currentCourses) {
+      final code = course['code'] as String;
+      final credits = course['credits'] as int;
+      final letter = _projectedGrades[code] ?? 'A';
+      totalPoints += (_getGpaValueFromLetter(letter) * credits);
+      totalCredits += credits;
+    }
+    return totalCredits > 0 ? (totalPoints / totalCredits) : 0.0;
+  }
+
+  double _calculateProjectedCumulativeGpa(double currentGpa) {
+    // Let's assume student has completed 45 credits historically with their current overall GPA
+    final int historicalCredits = 45;
+    final double historicalPoints = historicalCredits * currentGpa;
+    
+    double termPoints = 0;
+    int termCredits = 0;
+    for (var course in _currentCourses) {
+      final code = course['code'] as String;
+      final credits = course['credits'] as int;
+      final letter = _projectedGrades[code] ?? 'A';
+      termPoints += (_getGpaValueFromLetter(letter) * credits);
+      termCredits += credits;
+    }
+
+    final totalCredits = historicalCredits + termCredits;
+    final totalPoints = historicalPoints + termPoints;
+    return totalCredits > 0 ? (totalPoints / totalCredits) : 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.appState.isDarkMode;
+    final appState = context.appState;
+    final isDark = appState.isDarkMode;
+    final theme = Theme.of(context);
 
-    return RefreshIndicator(
-      onRefresh: _fetchGradesData,
-      color: const Color(0xFF4F46E5),
-      child: _buildBody(isDark),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            child: TabBar(
+              indicatorColor: theme.primaryColor,
+              indicatorWeight: 3,
+              labelColor: theme.primaryColor,
+              unselectedLabelColor: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              tabs: [
+                Tab(text: appState.translate('result').toUpperCase()),
+                Tab(text: appState.translate('gpa_planner').toUpperCase()),
+              ],
+            ),
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            RefreshIndicator(
+              onRefresh: _fetchGradesData,
+              color: theme.primaryColor,
+              child: _buildBody(isDark, appState),
+            ),
+            _buildGpaPlannerBody(isDark, appState),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody(bool isDark, AppState appState) {
+    final theme = Theme.of(context);
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Color(0xFF4F46E5)),
-            SizedBox(height: 16),
-            Text(
+            CircularProgressIndicator(color: theme.primaryColor),
+            const SizedBox(height: 16),
+            const Text(
               'Compiling semester records...',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             )
           ],
         ),
@@ -122,18 +222,19 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                 Text(
                   _errorMessage!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: _fetchGradesData,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
+                    backgroundColor: theme.primaryColor,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   icon: const Icon(Icons.refresh_rounded),
-                  label: Text(widget.appState.translate('retry')),
+                  label: Text(appState.translate('retry')),
                 ),
               ],
             ),
@@ -152,7 +253,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(28),
             gradient: LinearGradient(
               colors: isDark
                   ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
@@ -161,13 +262,13 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
               end: Alignment.bottomRight,
             ),
             border: Border.all(
-              color: isDark ? const Color(0xFF1E293B) : Colors.indigo.withOpacity(0.08),
+              color: isDark ? const Color(0xFF334155) : theme.primaryColor.withOpacity(0.08),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: isDark ? Colors.black26 : Colors.indigo.withOpacity(0.04),
-                blurRadius: 16,
+                color: isDark ? Colors.black38 : theme.primaryColor.withOpacity(0.04),
+                blurRadius: 20,
                 offset: const Offset(0, 8),
               )
             ],
@@ -182,14 +283,29 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                   return Stack(
                     alignment: Alignment.center,
                     children: [
+                      // Glow effect container
+                      Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.primaryColor.withOpacity(0.15),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(
-                        width: 100,
-                        height: 100,
+                        width: 96,
+                        height: 96,
                         child: CircularProgressIndicator(
                           value: progress,
-                          strokeWidth: 10,
-                          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.indigo.withOpacity(0.08),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                          strokeWidth: 9,
+                          backgroundColor: isDark ? const Color(0xFF1E293B) : theme.primaryColor.withOpacity(0.08),
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
                         ),
                       ),
                       Column(
@@ -224,20 +340,20 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.appState.translate('gpa'),
+                      appState.translate('gpa'),
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Semester: Year 3, Semester 1',
+                      'Semester: Year 2, Semester 2',
                       style: TextStyle(
                         fontSize: 12,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                        fontWeight: FontWeight.w500,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const Padding(
@@ -257,7 +373,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         // Result list header
         Text(
@@ -281,11 +397,12 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          label.toUpperCase(),
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 10,
             color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
             fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
           ),
         ),
         const SizedBox(height: 2),
@@ -309,27 +426,27 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-          width: 1,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          width: 1.2,
         ),
       ),
       child: Row(
         children: [
           // Letter Grade badge
           Container(
-            width: 48,
-            height: 48,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
               color: gradeColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             alignment: Alignment.center,
             child: Text(
               grade.gradeLetter,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: gradeColor,
               ),
@@ -348,7 +465,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 15,
                     color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                 ),
@@ -365,8 +482,8 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      width: 3,
-                      height: 3,
+                      width: 3.5,
+                      height: 3.5,
                       decoration: const BoxDecoration(
                         color: Colors.grey,
                         shape: BoxShape.circle,
@@ -377,7 +494,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                       '${grade.credits} Credits',
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
                         color: isDark ? const Color(0xFF64748B) : const Color(0xFF64748B),
                       ),
                     ),
@@ -418,9 +535,338 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
 
   Color _getGradeColor(String letter) {
     if (letter == 'A') return const Color(0xFF10B981); // Emerald
-    if (letter.startsWith('B')) return const Color(0xFF4F46E5); // Indigo
+    if (letter.startsWith('B')) return const Color(0xFF0D9488); // Teal
     if (letter.startsWith('C')) return const Color(0xFFF59E0B); // Amber
     if (letter.startsWith('D')) return const Color(0xFFEC4899); // Pink
     return Colors.redAccent; // F
   }
+
+  // NEW GPA TARGET PLANNER IMPLEMENTATION
+  Widget _buildGpaPlannerBody(bool isDark, AppState appState) {
+    final theme = Theme.of(context);
+    final studentGpa = appState.currentStudent?.gpa ?? 3.82;
+    
+    final projectedTermGpa = _calculateProjectedTermGpa();
+    final projectedCumulativeGpa = _calculateProjectedCumulativeGpa(studentGpa);
+
+    // Hardcoded past GPA terms data for Painter
+    final List<double> gpaHistory = [3.50, 3.62, 3.68, 3.75, studentGpa];
+    final List<String> gpaLabels = ['Y1S1', 'Y1S2', 'Y2S1', 'Y2S2', 'Current'];
+
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(20),
+      children: [
+        // Analytics Section
+        Text(
+          'GPA TREND ANALYSIS',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            letterSpacing: 1.0,
+          ),
+        ),
+        const SizedBox(height: 12),
+        
+        // Custom Line Chart Container
+        Container(
+          height: 200,
+          padding: const EdgeInsets.only(top: 28, left: 16, right: 16, bottom: 12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+              width: 1.2,
+            ),
+          ),
+          child: CustomPaint(
+            painter: _GpaTrendPainter(gpaHistory, gpaLabels, isDark, theme.primaryColor),
+          ),
+        ),
+        const SizedBox(height: 28),
+
+        // Summary Calculator metrics banner
+        Text(
+          'WHAT-IF GPA PLANNER',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            letterSpacing: 1.0,
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [const Color(0xFF0D9488).withOpacity(0.15), const Color(0xFF0F766E).withOpacity(0.05)]
+                  : [theme.primaryColor.withOpacity(0.06), theme.primaryColor.withOpacity(0.01)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(
+              color: theme.primaryColor.withOpacity(0.2),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      appState.translate('projected_gpa').toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      projectedTermGpa.toStringAsFixed(2),
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w900,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(width: 1, height: 50, color: theme.primaryColor.withOpacity(0.15)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      appState.translate('gpa_target').toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      projectedCumulativeGpa.toStringAsFixed(2),
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Courses select sheet
+        ..._currentCourses.map((course) {
+          final code = course['code'] as String;
+          final name = course['name'] as String;
+          final credits = course['credits'] as int;
+          final selectedLetter = _projectedGrades[code] ?? 'A';
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$code • $credits Credits',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                
+                // Dropdown container
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: DropdownButton<String>(
+                    value: selectedLetter,
+                    underline: const SizedBox(),
+                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: theme.primaryColor,
+                    ),
+                    icon: Icon(Icons.arrow_drop_down, color: theme.primaryColor),
+                    items: _gradeOptions.map((letter) {
+                      return DropdownMenuItem<String>(
+                        value: letter,
+                        child: Text(letter),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          _projectedGrades[code] = val;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+}
+
+// Custom Painter for GPA Line Chart
+class _GpaTrendPainter extends CustomPainter {
+  final List<double> gpaHistory;
+  final List<String> labels;
+  final bool isDark;
+  final Color primaryColor;
+
+  _GpaTrendPainter(this.gpaHistory, this.labels, this.isDark, this.primaryColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (gpaHistory.isEmpty) return;
+
+    final paintLine = Paint()
+      ..color = primaryColor
+      ..strokeWidth = 3.5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final paintDot = Paint()
+      ..color = primaryColor
+      ..style = PaintingStyle.fill;
+
+    final paintDotBorder = Paint()
+      ..color = isDark ? const Color(0xFF1E293B) : Colors.white
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+
+    final paintFill = Paint()
+      ..style = PaintingStyle.fill;
+
+    final double widthBetween = size.width / (gpaHistory.length - 1);
+    final Path path = Path();
+    final Path fillPath = Path();
+
+    // Map Y coordinates (GPA bounds 3.0 to 4.0)
+    double getY(double gpa) {
+      final normalized = (gpa - 3.0) / 1.0; // scale 0.0 to 1.0
+      return size.height - (normalized * (size.height - 50) + 25);
+    }
+
+    path.moveTo(0, getY(gpaHistory[0]));
+    fillPath.moveTo(0, size.height);
+    fillPath.lineTo(0, getY(gpaHistory[0]));
+
+    for (int i = 1; i < gpaHistory.length; i++) {
+      final x = i * widthBetween;
+      final y = getY(gpaHistory[i]);
+      path.lineTo(x, y);
+      fillPath.lineTo(x, y);
+    }
+
+    fillPath.lineTo(size.width, size.height);
+    fillPath.close();
+
+    // Draw background gradient fill
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    paintFill.shader = LinearGradient(
+      colors: [primaryColor.withOpacity(0.25), primaryColor.withOpacity(0.01)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ).createShader(rect);
+
+    canvas.drawPath(fillPath, paintFill);
+    canvas.drawPath(path, paintLine);
+
+    // Draw dots & labels
+    for (int i = 0; i < gpaHistory.length; i++) {
+      final x = i * widthBetween;
+      final y = getY(gpaHistory[i]);
+
+      // Draw dot
+      canvas.drawCircle(Offset(x, y), 6, paintDot);
+      canvas.drawCircle(Offset(x, y), 6, paintDotBorder);
+
+      // Draw text label below or above the dot
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: gpaHistory[i].toStringAsFixed(2),
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      textPainter.paint(canvas, Offset(x - textPainter.width / 2, y - 22));
+
+      // Draw term label at the bottom
+      final labelPainter = TextPainter(
+        text: TextSpan(
+          text: labels[i],
+          style: TextStyle(
+            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      labelPainter.paint(canvas, Offset(x - labelPainter.width / 2, size.height - 15));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GpaTrendPainter oldDelegate) => true;
 }

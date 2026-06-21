@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTrack Mobile — Presentation | VUTH Vatana • SOEUM Somanika</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kantumruy+Pro:wght@400;500;600;700&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0B0F19;
+      --bg-secondary: #131A2C;
+      --bg-surface: #1E293B;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --teal-500: #14B8A6;
+      --teal-600: #0D9488;
+      --teal-400: #2DD4BF;
+      --emerald-500: #10B981;
+      --rose-500: #F43F5E;
+      --amber-500: #F59E0B;
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --accent-glow: rgba(20, 184, 166, 0.25);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Inter', 'Kantumruy Pro', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ───── Presentation Container ───── */
+    .presentation {
+      width: 100vw; height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ───── Keyboard Hint ───── */
+    .keyboard-hint {
+      position: fixed;
+      top: 16px; right: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      opacity: 0.85;
+      z-index: 200;
+      transition: opacity 0.5s;
+    }
+
+    .keyboard-hint kbd {
+      background: var(--bg-surface);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: inherit;
+    }
+
+    /* ───── Slide Area ───── */
+    .slide-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.95) translateX(60px);
+      transition: all 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1) translateX(0);
+      pointer-events: auto;
+    }
+
+    .slide.exit-left {
+      opacity: 0;
+      transform: scale(0.95) translateX(-60px);
+    }
+
+    /* ───── Slide Layout & Styling ───── */
+    .slide-content {
+      width: 90%;
+      max-width: 1100px;
+      height: 82%;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, #0d121f 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 28px;
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+
+    .slide-content::before {
+      content: '';
+      position: absolute;
+      top: -15%; left: -15%;
+      width: 40%; height: 40%;
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+      filter: blur(50px);
+      pointer-events: none;
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 16px;
+    }
+
+    .slide-header h2 {
+      font-size: 32px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+    }
+
+    .slide-header h2 span.icon {
+      color: var(--teal-400);
+      background: rgba(20, 184, 166, 0.08);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 24px;
+    }
+
+    .slide-header h2 span.text {
+      background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-header .slide-tag {
+      background: rgba(20, 184, 166, 0.1);
+      border: 1px solid rgba(20, 184, 166, 0.15);
+      color: var(--teal-400);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      padding: 24px 0;
+      align-items: center;
+    }
+
+    .slide-body.full-width {
+      grid-template-columns: 1fr;
+    }
+
+    .slide-bullets {
+      list-style: none;
+    }
+
+    .slide-bullets li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 18px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .slide-bullets li strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .slide-bullets li::before {
+      content: '✦';
+      position: absolute;
+      left: 4px; top: 0px;
+      color: var(--teal-400);
+      font-size: 15px;
+    }
+
+    /* ───── UI Mockups Design ───── */
+    .slide-visual {
+      background: rgba(8, 12, 22, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
+      padding: 20px;
+      height: 100%;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .mock-phone {
+      width: 220px;
+      height: 380px;
+      background: #0f172a;
+      border: 8px solid #334155;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Screen Mockups */
+    .mock-header {
+      background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-500) 100%);
+      padding: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mock-title {
+      font-size: 11px;
+      color: #fff;
+    }
+
+    .mock-content {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .mock-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+
+    .mock-btn {
+      background: var(--teal-500);
+      color: white;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Strength Meter Mock */
+    .mock-strength {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .strength-bar {
+      height: 4px;
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      width: 80%;
+      background: var(--emerald-500);
+    }
+    .strength-text {
+      font-size: 8px;
+      color: var(--emerald-500);
+      text-align: right;
+    }
+
+    /* Bottom Nav Mock */
+    .mock-bottom-nav {
+      height: 38px;
+      background: #1e293b;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .mock-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: #64748b;
+      font-size: 8px;
+    }
+    .mock-nav-item.active {
+      color: var(--teal-400);
+    }
+    .mock-nav-item span {
+      font-size: 10px;
+    }
+
+    /* Drawer Mock */
+    .mock-drawer-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+    .mock-drawer {
+      width: 160px;
+      height: 100%;
+      background: #1e293b;
+      position: absolute;
+      left: 0; top: 0;
+      z-index: 11;
+      display: flex;
+      flex-direction: column;
+    }
+    .mock-drawer-header {
+      background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-500) 100%);
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mock-drawer-avatar {
+      width: 24px; height: 24px;
+      background: #fff;
+      border-radius: 50%;
+    }
+    .mock-drawer-name {
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .mock-drawer-email {
+      font-size: 7px;
+      color: rgba(255,255,255,0.7);
+    }
+    .mock-drawer-menu {
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mock-drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 8px;
+      color: #94a3b8;
+      padding: 4px;
+    }
+
+    /* Student Card Mock */
+    .mock-student-card {
+      width: 180px;
+      height: 110px;
+      background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+      border-radius: 12px;
+      padding: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: white;
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .card-status {
+      font-size: 6px;
+      background: rgba(255,255,255,0.2);
+      padding: 2px 6px;
+      border-radius: 99px;
+    }
+    .card-middle {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .card-avatar {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+    }
+    .card-name {
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .card-major {
+      font-size: 7px;
+      color: rgba(255,255,255,0.8);
+    }
+    .card-id {
+      font-size: 7px;
+      color: #fcd34d;
+      font-weight: bold;
+    }
+
+    /* Dashboard Cards Grid Mock */
+    .mock-dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+    .mock-dash-card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .dash-card-title {
+      font-size: 7px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .dash-card-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .dash-card-footer {
+      font-size: 7px;
+      color: var(--teal-400);
+    }
+
+    /* API Flow diagram */
+    .flow-step {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-align: center;
+      width: 160px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .flow-arrow {
+      color: var(--teal-400);
+      font-size: 14px;
+      margin: 4px 0;
+    }
+
+    /* Agenda Grid */
+    .agenda-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    .agenda-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .agenda-card:hover {
+      background: rgba(20, 184, 166, 0.05);
+      border-color: rgba(20, 184, 166, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .agenda-num {
+      color: var(--teal-400);
+      font-weight: 800;
+      font-size: 16px;
+      background: rgba(20, 184, 166, 0.1);
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .agenda-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 14px;
+      font-weight: 500;
+    }
+
+    .slide-footer span.author {
+      color: var(--teal-400);
+    }
+
+    /* ───── Title Slide Design ───── */
+    .title-slide-content {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      height: 100%;
+    }
+
+    .title-logo {
+      padding: 24px;
+      background: rgba(20, 184, 166, 0.1);
+      border: 1.5px solid rgba(20, 184, 166, 0.2);
+      border-radius: 50%;
+      margin-bottom: 12px;
+      box-shadow: 0 0 40px rgba(20, 184, 166, 0.15);
+      animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 40px rgba(20, 184, 166, 0.15); }
+      50% { transform: scale(1.04); box-shadow: 0 0 50px rgba(20, 184, 166, 0.3); }
+      100% { transform: scale(1); box-shadow: 0 0 40px rgba(20, 184, 166, 0.15); }
+    }
+
+    .title-h1 {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--teal-400) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .title-meta {
+      margin-top: 30px;
+      display: flex;
+      gap: 32px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .title-meta strong {
+      color: var(--text-secondary);
+    }
+
+    /* ───── Bottom Bar ───── */
+    .bottom-bar {
+      height: 64px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .slide-counter {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      min-width: 100px;
+    }
+
+    .slide-counter .current {
+      color: var(--teal-400);
+      font-size: 20px;
+    }
+
+    .progress-container {
+      flex: 1;
+      max-width: 600px;
+      height: 6px;
+      background: var(--bg-surface);
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal-600), var(--teal-400));
+      border-radius: 99px;
+      transition: width 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      width: 42px; height: 42px;
+      border: none;
+      border-radius: 12px;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--teal-600);
+      box-shadow: 0 0 20px var(--accent-glow);
+      transform: scale(1.05);
+    }
+
+    .nav-btn:active { transform: scale(0.95); }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .nav-btn:disabled:hover {
+      background: var(--bg-surface);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .fullscreen-btn {
+      background: transparent;
+      border: 1.5px solid var(--bg-surface);
+    }
+
+    .fullscreen-btn:hover {
+      border-color: var(--teal-400);
+      background: rgba(20, 184, 166, 0.08);
+    }
+
+    .notes-toggle {
+      background: transparent;
+      border: 1.5px solid var(--bg-surface);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 0 14px;
+      height: 42px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .notes-toggle:hover {
+      border-color: var(--teal-400);
+      color: var(--teal-400);
+      background: rgba(20, 184, 166, 0.05);
+    }
+
+    .notes-toggle.active {
+      border-color: var(--teal-400);
+      color: var(--teal-400);
+      background: rgba(20, 184, 166, 0.12);
+    }
+
+    /* ───── Speaker Notes Panel ───── */
+    .speaker-notes {
+      position: fixed;
+      bottom: 64px; right: 0;
+      width: 420px;
+      max-height: 45vh;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      border-top: 1px solid var(--border-color);
+      border-radius: 16px 0 0 0;
+      padding: 20px 24px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      z-index: 90;
+      box-shadow: -8px 0 30px rgba(0,0,0,0.3);
+    }
+
+    .speaker-notes.open { transform: translateX(0); }
+
+    .speaker-notes h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--teal-400);
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .speaker-notes p, .speaker-notes li {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .speaker-notes ul {
+      padding-left: 18px;
+    }
+
+    .speaker-notes li {
+      margin-bottom: 6px;
+    }
+
+    .speaker-notes strong {
+      color: var(--text-primary);
+    }
+
+    .speaker-notes code {
+      background: var(--bg-surface);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--teal-400);
+    }
+
+    .slide-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .speaker-notes::-webkit-scrollbar { width: 5px; }
+    .speaker-notes::-webkit-scrollbar-track { background: transparent; }
+    .speaker-notes::-webkit-scrollbar-thumb {
+      background: var(--bg-surface);
+      border-radius: 99px;
+    }
+
+    @media (max-width: 768px) {
+      .speaker-notes { width: 100%; border-radius: 16px 16px 0 0; }
+      .slide-title { display: none; }
+      .keyboard-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="presentation">
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint" id="keyboardHint">
+      <kbd>←</kbd> <kbd>→</kbd> Navigation &nbsp;|&nbsp; <kbd>F</kbd> Fullscreen &nbsp;|&nbsp; <kbd>N</kbd> Notes
+    </div>
+
+    <!-- Slide Viewport -->
+    <div class="slide-viewport" id="slideViewport">
+      
+      <!-- Slide 0: Title Slide -->
+      <div class="slide active" data-index="0">
+        <div class="slide-content">
+          <div class="title-slide-content">
+            <div class="title-logo">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open" style="color: var(--teal-400);"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </div>
+            <h1 class="title-h1">EduTrack Mobile</h1>
+            <p class="title-subtitle" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">Academic & Student Information Hub built with Flutter. Sleek design, local accounts, and dynamic data integration.<br><span style="color: var(--text-secondary); font-size: 14px;">(កម្មវិធីគ្រប់គ្រងព័ត៌មានសិក្សាសិស្សនិស្សិតចល័ត បង្កើតដោយ Flutter ជាមួយរចនាបថទាក់ទាញ គណនីក្នុងម៉ាស៊ីន និងការភ្ជាប់ទិន្នន័យស្វាហាប់។)</span></p>
+            <div class="title-meta">
+              <span>Developers (អ្នកអភិវឌ្ឍន៍): <strong>Vuth Vatana & Soeum Somanika</strong></span>
+              <span>Year (ឆ្នាំសិក្សា): <strong>Year 3, Semester 2 (2026)</strong></span>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>EduTrack Mobile Project</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 1: Agenda -->
+      <div class="slide" data-index="1">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">☰</span><span class="text">Agenda / មាតិកា</span></h2>
+            <span class="slide-tag">Outline</span>
+          </div>
+          <div class="slide-body full-width">
+            <div class="agenda-grid">
+              <div class="agenda-card"><div class="agenda-num">01</div><div class="agenda-title">Login (ការចូលគណនី)</div></div>
+              <div class="agenda-card"><div class="agenda-num">02</div><div class="agenda-title">Register (ការចុះឈ្មោះ)</div></div>
+              <div class="agenda-card"><div class="agenda-num">03</div><div class="agenda-title">App Bar (របារផ្នែកខាងលើ)</div></div>
+              <div class="agenda-card"><div class="agenda-num">04</div><div class="agenda-title">Navigation Bar (របាររុករកខាងក្រោម)</div></div>
+              <div class="agenda-card"><div class="agenda-num">05</div><div class="agenda-title">Drawer (ម៉ឺនុយចំហៀង)</div></div>
+              <div class="agenda-card"><div class="agenda-num">06</div><div class="agenda-title">Profile (ព័ត៌មានផ្ទាល់ខ្លួន)</div></div>
+              <div class="agenda-card"><div class="agenda-num">07</div><div class="agenda-title">Setting (ការកំណត់)</div></div>
+              <div class="agenda-card"><div class="agenda-num">08</div><div class="agenda-title">Home (ផ្ទាំងព័ត៌មានដើម)</div></div>
+              <div class="agenda-card"><div class="agenda-num">09</div><div class="agenda-title">Notification (ការជូនដំណឹង)</div></div>
+              <div class="agenda-card" style="grid-column: span 3; justify-content: center;"><div class="agenda-num">10</div><div class="agenda-title">Call API Test / ការតេស្តភ្ជាប់ API (Internet Access & Fallback)</div></div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Presentation Index</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Login -->
+      <div class="slide" data-index="2">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">🔑</span><span class="text">Login Screen / ការចូលគណនី</span></h2>
+            <span class="slide-tag">Authentication</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Secure Login System (ប្រព័ន្ធចូលគណនីមានសុវត្ថិភាព)</strong>: Input validation for email format and empty fields (ការផ្ទៀងផ្ទាត់ទម្រង់អ៊ីមែល និងការពារចន្លោះទទេ)។</li>
+              <li><strong>AuthService.login() (ការផ្ទៀងផ្ទាត់គណនី)</strong>: Reads local file <code>accounts.json</code> to authenticate (អានឯកសារ <code>accounts.json</code> ក្នុងម៉ាស៊ីនដើម្បីផ្ទៀងផ្ទាត់គណនី)។</li>
+              <li><strong>User Experience (បទពិសោធន៍អ្នកប្រើប្រាស់)</strong>: Displays clear errors via red <code>SnackBar</code> alerts (បង្ហាញសារព្រមានពណ៌ក្រហមច្បាស់លាស់)។</li>
+              <li><strong>State Injection (ការបញ្ចូលទិន្នន័យ State)</strong>: Sets active student globally in <code>AppState</code> on success (រក្សាទុកទិន្នន័យសិស្សទៅក្នុង <code>AppState</code> ជាសកលពេលជោគជ័យ)។</li>
+              <li><strong>Forgot Password (ភ្លេចពាក្យសម្ងាត់)</strong>: Pop-up dialog to request recovery link (ផ្ទាំងស្នើសុំតំណភ្ជាប់សារឡើងវិញ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div class="mock-phone">
+                <div class="mock-header"><span>EduTrack</span><span>9:41</span></div>
+                <div class="mock-content">
+                  <div style="font-size: 16px; font-weight: bold; text-align: center; color: white; margin-bottom: 10px;">Welcome Back</div>
+                  <div class="mock-input">vatana@gmail.com</div>
+                  <div class="mock-input">••••••••</div>
+                  <div class="mock-btn">Log In</div>
+                  <div style="font-size: 8px; text-align: center; color: #64748b;">Forgot Password?</div>
+                </div>
+                <div style="height: 15px; background: #1e293b;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 2 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Register -->
+      <div class="slide" data-index="3">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">📝</span><span class="text">Register Screen / ការចុះឈ្មោះ</span></h2>
+            <span class="slide-tag">Registration</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>New Student Registration (ចុះឈ្មោះសិស្សថ្មី)</strong>: Appends new user profiles to local JSON storage (បន្ថែមទិន្នន័យគណនីថ្មីទៅក្នុងឯកសារ JSON)។</li>
+              <li><strong>Password Strength Meter (រង្វាស់កម្រិតលេខសម្ងាត់)</strong>: Real-time analysis for uppercase, lowercase, numbers, and symbols (វិភាគកម្រិតសុវត្ថិភាពកូដភ្លាមៗ)។</li>
+              <li><strong>Stringent Validation (លក្ខខណ្ឌផ្ទៀងផ្ទាត់)</strong>: Checks duplicate emails, passwords match, and formats (ពិនិត្យអ៊ីមែលជាន់គ្នា ការផ្គូផ្គង និងទម្រង់កូដ)។</li>
+              <li><strong>Dynamic Asset Association (រូបតំណាងស្វ័យប្រវត្តិ)</strong>: Automatically assigns a default Unsplash avatar upon signup (កំណត់រូបថតគំរូ Unsplash ស្វ័យប្រវត្តិតែម្តង)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div class="mock-phone">
+                <div class="mock-header"><span>Register</span><span>9:41</span></div>
+                <div class="mock-content" style="justify-content: flex-start; padding-top: 15px; gap: 8px;">
+                  <div class="mock-input">Full Name</div>
+                  <div class="mock-input">Email Address</div>
+                  <div class="mock-input">Password</div>
+                  <div class="mock-strength">
+                    <div class="strength-bar"><div class="strength-fill"></div></div>
+                    <div class="strength-text">Strong Password</div>
+                  </div>
+                  <div class="mock-btn" style="margin-top: 10px;">Sign Up</div>
+                </div>
+                <div style="height: 15px; background: #1e293b;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 3 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: App Bar -->
+      <div class="slide" data-index="4">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">📱</span><span class="text">App Bar / របារផ្នែកខាងលើ</span></h2>
+            <span class="slide-tag">UI Header</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Bilingual Support (ចំណុចប្រទាក់ពីរភាសា)</strong>: App title translated dynamically (បកប្រែចំណងជើង និងអក្សរស្វ័យប្រវត្តិតាមភាសា ខ្មែរ/English)។</li>
+              <li><strong>Drawer Trigger (ប៊ូតុងបើក Drawer)</strong>: Left menu icon links to open the side navigation drawer (ប៊ូតុងម៉ឺនុយសម្រាប់បិទបើករបារចំហៀង)។</li>
+              <li><strong>Notification Indicator (កណ្តឹងជូនដំណឹង)</strong>: Right action displays a bell icon with dynamic badge count (បង្ហាញកណ្តឹងជូនដំណឹងដែលមានភាពរស់រវើក)។</li>
+              <li><strong>Unread Count (ចំនួនសារមិនទាន់អាន)</strong>: Badge count updates dynamically via <code>AppState.unreadNotificationsCount</code> (គណនាចំនួនសារថ្មីស្វ័យប្រវត្តិ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div style="width: 240px; background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-500) 100%); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                <div style="font-size: 16px; color: white;">☰</div>
+                <div style="font-size: 14px; font-weight: bold; color: white;">EduTrack Mobile</div>
+                <div style="position: relative;">
+                  <span style="font-size: 16px; color: white;">🔔</span>
+                  <div style="position: absolute; top: -4px; right: -4px; background: var(--rose-500); color: white; font-size: 7px; font-weight: bold; width: 12px; height: 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 4 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Navigation Bar -->
+      <div class="slide" data-index="5">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">🧭</span><span class="text">Navigation Bar / របាររុករកខាងក្រោម</span></h2>
+            <span class="slide-tag">Main Navigation</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>5 Core Sections (ទំព័រគោលទាំង ៥)</strong>: Home, Schedule, Result, Library, and Profile (រុករករវាងទំព័រដើម កាលវិភាគ លទ្ធផល បណ្ណាល័យ និងព័ត៌មានសិស្ស)។</li>
+              <li><strong>IndexedStack Structure (រក្សាស្ថានភាពទំព័រ)</strong>: Retains user state, page inputs, and scroll offsets when toggling tabs (រក្សាស្ថានភាពទំព័រមិនឱ្យបាត់បង់)។</li>
+              <li><strong>Material Design 3</strong>: Active states feature pill badges, color indicators, and micro-scale animations (រចនាបែបទំនើប មានគំនូរជីវចល និងពណ៌ច្បាស់លាស់)។</li>
+              <li><strong>Context-Aware Localization (អក្សរពីរភាសា)</strong>: Renders localized bottom bar text based on settings (បង្ហាញឈ្មោះ Tab ជាពីរភាសាយ៉ាងត្រឹមត្រូវ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div style="width: 260px; background: #1e293b; border-radius: 14px; padding: 10px; display: flex; justify-content: space-around; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                <div class="mock-nav-item"><span>🏠</span><span>Home</span></div>
+                <div class="mock-nav-item"><span>📅</span><span>Schedule</span></div>
+                <div class="mock-nav-item"><span>📊</span><span>Result</span></div>
+                <div class="mock-nav-item active"><span>📚</span><span style="color: var(--teal-400); font-weight: bold;">Library</span></div>
+                <div class="mock-nav-item"><span>👤</span><span>Profile</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 5 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 6: Drawer -->
+      <div class="slide" data-index="6">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">📂</span><span class="text">Drawer Menu / ម៉ឺនុយចំហៀង</span></h2>
+            <span class="slide-tag">Side Navigation</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Student Info Header (ក្បាលទំព័រព័ត៌មានសិស្ស)</strong>: Displays student photo, name, major, and email (បង្ហាញរូបថត ឈ្មោះ ជំនាញ និងអ៊ីមែលសិស្ស)។</li>
+              <li><strong>Expanded Navigation Tree (បញ្ជីរុករកបន្ថែម)</strong>: Direct links to Assignments, Attendance, Campus Events, and Settings (តំណភ្ជាប់ទៅកិច្ចការសាលា វត្តមាន ព្រឹត្តិការណ៍ និងការកំណត់)។</li>
+              <li><strong>Bilingual Navigation Labels (បញ្ជីឈ្មោះពីរភាសា)</strong>: Khmer and English labels dynamically adapt via <code>AppState</code> (ប្តូរអក្សរបញ្ជីមុខងារជាពីរភាសាតាមការកំណត់)។</li>
+              <li><strong>Logout Button (ការចាកចេញពីគណនី)</strong>: Clears student session, terminates active listeners, and redirects to Login (លុបព័ត៌មានសិស្សចេញ រួចត្រឡប់ទៅទំព័រ Login)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div class="mock-phone">
+                <div class="mock-header"><span>Drawer Opened</span><span>9:41</span></div>
+                <div class="mock-drawer-overlay">
+                  <div class="mock-drawer">
+                    <div class="mock-drawer-header">
+                      <div class="mock-drawer-avatar"></div>
+                      <div class="mock-drawer-name">Vuth Vatana</div>
+                      <div class="mock-drawer-email">vatana@gmail.com</div>
+                    </div>
+                    <div class="mock-drawer-menu">
+                      <div class="mock-drawer-item"><span>📝</span> Assignments</div>
+                      <div class="mock-drawer-item"><span>✅</span> Attendance</div>
+                      <div class="mock-drawer-item"><span>📢</span> Campus Events</div>
+                      <div class="mock-drawer-item"><span>⚙️</span> Settings</div>
+                      <div class="mock-drawer-item" style="color: var(--rose-500); margin-top: 20px;"><span>🚪</span> Log Out</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 6 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Profile -->
+      <div class="slide" data-index="7">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">👤</span><span class="text">Profile & Student Card / ព័ត៌មានផ្ទាល់ខ្លួន & កាតសិស្ស</span></h2>
+            <span class="slide-tag">Student Details</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Profile Page Layout (ប្លង់ព័ត៌មានសង្ខេបសិស្ស)</strong>: Renders virtual student card, core bio list, and edit button (បង្ហាញកាតសិស្ស ស្ថិតិ GPA ឆ្នាំសិក្សា អ៊ីមែល លេខទូរស័ព្ទ និងប៊ូតុងកែសម្រួល)។</li>
+              <li><strong>Avatar & Data Loading (ការអានទិន្នន័យរូបភាព & API)</strong>: Declaring <code>INTERNET</code> permission enables remote Unsplash image downloads and GitHub API sync (ការបន្ថែមសិទ្ធិអ៊ីនធឺណិតអនុញ្ញាតឱ្យបង្ហាញរូបភាព Avatar និងទាញទិន្នន័យពី API ជោគជ័យ)។</li>
+              <li><strong>Edit Profile Sheet (ផ្ទាំងកែសម្រួលព័ត៌មាន)</strong>: Bottom sheet modal dynamically updates name, phone, and avatar URL in memory (ផ្ទាំងកែសម្រួលអនុញ្ញាតឱ្យកែប្រែព័ត៌មានផ្ទាល់ខ្លួនភ្លាមៗ)។</li>
+              <li><strong>Instant App-Wide Sync (ការធ្វើបច្ចុប្បន្នភាពទូទាំង App)</strong>: Profile edits instantly redraw headers in the Dashboard, Drawer, and Profile screens (ការផ្លាស់ប្តូរនឹងផ្សព្វផ្សាយទៅគ្រប់ទំព័រស្វ័យប្រវត្តិ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div class="mock-phone" style="width: 220px; height: 380px;">
+                <!-- Header -->
+                <div class="mock-header" style="background: white; border-bottom: 1px solid #e2e8f0; color: #0f172a; padding: 8px 12px; height: 32px;">
+                  <span style="font-size: 9px; cursor: pointer;">☰</span>
+                  <span style="font-size: 10px; font-weight: bold; color: #0f172a;">Profile</span>
+                  <div style="position: relative;">
+                    <span style="font-size: 10px; color: #0f172a;">🔔</span>
+                    <div style="position: absolute; top: -3px; right: -3px; background: var(--rose-500); color: white; font-size: 6px; font-weight: bold; width: 9px; height: 9px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+                  </div>
+                </div>
+                <!-- Content Area -->
+                <div class="mock-content" style="background: #f8fafc; padding: 8px; gap: 8px; justify-content: flex-start; overflow-y: auto; color: #0f172a;">
+                  <!-- Student Card -->
+                  <div class="mock-student-card" style="width: 100%; height: 90px; padding: 8px; border-radius: 12px; background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); color: white; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div class="card-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                      <span class="card-title" style="font-size: 7px; font-weight: 700; letter-spacing: 0.5px;">STUDENT CARD</span>
+                      <span class="card-status" style="font-size: 6px; background: rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 99px;">ACTIVE</span>
+                    </div>
+                    <div class="card-middle" style="display: flex; gap: 8px; align-items: center;">
+                      <div class="card-avatar" style="width: 32px; height: 32px; border: 1.5px solid white; border-radius: 50%; background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'); background-size: cover; background-position: center;"></div>
+                      <div style="display: flex; flex-direction: column; gap: 1px; text-align: left;">
+                        <div class="card-name" style="font-size: 10px; font-weight: 700; color: white;">Vuth Vatana</div>
+                        <div class="card-major" style="font-size: 7px; color: rgba(255,255,255,0.9);">Software Development</div>
+                      </div>
+                    </div>
+                    <div class="card-id" style="font-size: 7px; color: #fcd34d; font-weight: bold; text-align: left;">Student ID: DUC2024-0001</div>
+                  </div>
+                  <!-- Detail list -->
+                  <div style="background: white; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 4px; padding: 6px; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;">
+                      <span style="font-size: 8px;">🎓</span>
+                      <div style="display: flex; flex-direction: column; text-align: left;">
+                        <span style="font-size: 5px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Major</span>
+                        <span style="font-size: 7px; font-weight: 600; color: #334155;">Software Development</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;">
+                      <span style="font-size: 8px;">📅</span>
+                      <div style="display: flex; flex-direction: column; text-align: left;">
+                        <span style="font-size: 5px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Academic Year</span>
+                        <span style="font-size: 7px; font-weight: 600; color: #334155;">Year 3, Semester 2</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;">
+                      <span style="font-size: 8px;">✉️</span>
+                      <div style="display: flex; flex-direction: column; text-align: left;">
+                        <span style="font-size: 5px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Email</span>
+                        <span style="font-size: 7px; font-weight: 600; color: #334155;">vatana@gmail.com</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;">
+                      <span style="font-size: 8px;">📞</span>
+                      <div style="display: flex; flex-direction: column; text-align: left;">
+                        <span style="font-size: 5px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Phone Number</span>
+                        <span style="font-size: 7px; font-weight: 600; color: #334155;">+855 89 777 666</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; padding-bottom: 1px;">
+                      <span style="font-size: 8px;">⭐</span>
+                      <div style="display: flex; flex-direction: column; text-align: left;">
+                        <span style="font-size: 5px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">Current GPA</span>
+                        <span style="font-size: 7px; font-weight: 600; color: #334155;">3.82</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Edit Button -->
+                  <div class="mock-btn" style="background: #0d9488; color: white; padding: 5px; border-radius: 6px; font-size: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span>✏️</span> Edit Profile
+                  </div>
+                </div>
+                <!-- Bottom Bar -->
+                <div class="mock-bottom-nav" style="height: 30px;">
+                  <div class="mock-nav-item"><span>🏠</span></div>
+                  <div class="mock-nav-item"><span>📅</span></div>
+                  <div class="mock-nav-item"><span>📊</span></div>
+                  <div class="mock-nav-item"><span>📚</span></div>
+                  <div class="mock-nav-item active"><span>👤</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 7 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Setting -->
+      <div class="slide" data-index="8">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">⚙️</span><span class="text">Settings System / ប្រព័ន្ធកំណត់</span></h2>
+            <span class="slide-tag">App Configuration</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Bilingual Localization (ការប្តូរភាសា)</strong>: Dropdown selection between English and Khmer (ប៊ូតុងជ្រើសរើសភាសា អង់គ្លេស និង ខ្មែរ ភ្លាមៗ)។</li>
+              <li><strong>Dark Theme Toggle (មុខងារងងឹត)</strong>: Toggle switch updating app theme globally via <code>themeMode</code> (ប៊ូតុងបិទបើកពន្លឺអេក្រង់ ទូទាំងកម្មវិធី)។</li>
+              <li><strong>Security Password Change (ការប្តូរលេខកូដ)</strong>: Secure form validating current credentials before modifying (ផ្ទាំងផ្ទៀងផ្ទាត់ និងកែប្រែពាក្យសម្ងាត់គណនី)។</li>
+              <li><strong>State Dispatcher (ការចែកចាយស្ថានភាព)</strong>: Instantly redraws theme/language changes across screens (អនុវត្តការប្តូរពណ៌ ឬភាសាទៅគ្រប់ទំព័រភ្លាមៗ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div style="width: 220px; background: #1e293b; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+                  <span>🌙 Dark Mode</span>
+                  <div style="width: 32px; height: 18px; background: var(--teal-500); border-radius: 99px; position: relative;"><div style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                  <span>🌐 Language</span>
+                  <span style="color: var(--teal-400); font-weight: bold;">ភាសាខ្មែរ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 8 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 9: Home -->
+      <div class="slide" data-index="9">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">🏠</span><span class="text">Home Dashboard / ផ្ទាំងព័ត៌មានដើម</span></h2>
+            <span class="slide-tag">Hub Dashboard</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Quick Actions Grid (ប្រអប់បញ្ជាផ្លូវកាត់)</strong>: Shortcuts linking to Assignments, Attendance, Events, and GPA (ប៊ូតុងរហ័សទៅកាន់កិច្ចការ វត្តមាន ព្រឹត្តិការណ៍ និងផែនការ)។</li>
+              <li><strong>Overall Stats Cards (កាតស្ថិតិសង្ខេប)</strong>: Displays fields calculating GPA (e.g. 3.82) and attendance (94%) (បង្ហាញស្ថិតិសំខាន់ៗដូចជា GPA និងវត្តមាន)។</li>
+              <li><strong>Parallel Request Loading (ទាញទិន្នន័យស្របគ្នា)</strong>: Executes API calls concurrently via <code>Future.wait</code> (រត់ការទាញយកទិន្នន័យពី API ច្រើនស្របគ្នាដើម្បីសន្សំពេលវេលា)។</li>
+              <li><strong>Upcoming List Feeds (លំហូរកិច្ចការសាលា)</strong>: Renders a preview feed of unsubmitted assignments and campus news (បង្ហាញបញ្ជីកិច្ចការថ្មីៗ និងសេចក្តីប្រកាសចុងក្រោយ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div class="mock-dashboard-grid">
+                <div class="mock-dash-card">
+                  <span class="dash-card-title">Attendance</span>
+                  <span class="dash-card-value">94.0%</span>
+                  <span class="dash-card-footer">Good standing</span>
+                </div>
+                <div class="mock-dash-card">
+                  <span class="dash-card-title">GPA</span>
+                  <span class="dash-card-value">3.82</span>
+                  <span class="dash-card-footer">Excellent</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 9 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 10: Notification -->
+      <div class="slide" data-index="10">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">🔔</span><span class="text">Notifications System / ប្រព័ន្ធជូនដំណឹង</span></h2>
+            <span class="slide-tag">Announcements</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>School Announcement Feed (បញ្ជីសេចក្តីប្រកាស)</strong>: Keeps students informed on timetables, exams, and scholarships (សេចក្តីជូនដំណឹងពីការប្រឡង កាលវិភាគ និងព័ត៌មានសាលា)។</li>
+              <li><strong>Unread Indicator Badges (សញ្ញាសារមិនទាន់អាន)</strong>: Displays blue dot icons beside unread items (បង្ហាញចំណុចពណ៌ខៀវតំណាងឱ្យសារថ្មីមិនទាន់បើកមើល)។</li>
+              <li><strong>Mark as Read Interaction (សម្គាល់ថាអានរួច)</strong>: Tapping items flags them as read and updates app bar badge (ចុចមើលសារនឹងលុបចំណុចខៀវ និងកាត់ការជូនដំណឹងលើ AppBar)។</li>
+              <li><strong>Bulk Read Actions (ការសម្គាល់អានទាំងអស់)</strong>: Dedicated button clears all notification badges concurrently (ប៊ូតុងសម្រាប់លុបសញ្ញាសារមិនទាន់អានទាំងអស់ក្នុងពេលតែមួយ)។</li>
+            </ul>
+            <div class="slide-visual">
+              <div style="width: 220px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="background: #1e293b; border-radius: 8px; padding: 10px; font-size: 10px; border-left: 3px solid var(--teal-500); position: relative;">
+                  <div style="font-weight: bold; color: white;">Semester II Open</div>
+                  <div style="color: #94a3b8; font-size: 8px;">Classes start Monday...</div>
+                  <div style="position: absolute; right: 8px; top: 12px; width: 6px; height: 6px; background: #38bdf8; border-radius: 50%;"></div>
+                </div>
+                <div style="background: #1e293b; border-radius: 8px; padding: 10px; font-size: 10px; border-left: 3px solid #64748b; opacity: 0.7;">
+                  <div style="font-weight: bold; color: white;">Library Hours Extended</div>
+                  <div style="color: #94a3b8; font-size: 8px;">24/7 open for exams...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 10 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 11: Call API Test -->
+      <div class="slide" data-index="11">
+        <div class="slide-content">
+          <div class="slide-header">
+            <h2><span class="icon">🔌</span><span class="text">Call API Test / ការតេស្តភ្ជាប់ API</span></h2>
+            <span class="slide-tag">Network Flow</span>
+          </div>
+          <div class="slide-body">
+            <ul class="slide-bullets" style="font-family: 'Kantumruy Pro', 'Inter', sans-serif;">
+              <li><strong>Unified Dynamic Fetching (ការទាញទិន្នន័យឆ្លាតវៃ)</strong>: Requests JSON database from raw GitHub URL online (ទាញយកទិន្នន័យ JSON ពី GitHub តាមរយៈអ៊ីនធឺណិត)។</li>
+              <li><strong>Robust Offline Fallback (ប្រព័ន្ធរក្សាទិន្នន័យបម្រុង)</strong>: Reverts to local `db.json` on timeout/failure (ប្តូរទៅអានឯកសារក្នុងម៉ាស៊ីនពេលគ្មានអ៊ីនធឺណិត ឬយឺតខ្លាំង)។</li>
+              <li><strong>External API Integration (បណ្ណាល័យឌីជីថល)</strong>: Calls Open Library API to fetch computer science book listings (ទាញយកបញ្ជីសៀវភៅកុំព្យូទ័រថ្មីៗពី Open Library)។</li>
+              <li><strong>Release APK Permissions Fix (ការដោះស្រាយបញ្ហាដំឡើង APK)</strong>: Added <code>INTERNET</code> permission to avoid network image/data failures (បន្ថែមសិទ្ធិអ៊ីនធឺណិតដើម្បីបង្ហាញរូបភាព និងទិន្នន័យលើទូរស័ព្ទ)។</li>
+            </ul>
+            <div class="slide-visual" style="gap: 8px;">
+              <div class="flow-step" style="border-color: var(--teal-500);">App Requests Data</div>
+              <div class="flow-arrow">▼</div>
+              <div class="flow-step">Fetch GitHub Raw URL</div>
+              <div class="flow-arrow">▼</div>
+              <div style="display: flex; gap: 10px;">
+                <div class="flow-step" style="width: 100px; border-color: var(--emerald-500); font-size: 9px;">Success<br>Online Data</div>
+                <div class="flow-step" style="width: 100px; border-color: var(--rose-500); font-size: 9px;">Failure / Timeout<br>Local JSON</div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>Slide 11 of 11</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 12: Thank You -->
+      <div class="slide" data-index="12">
+        <div class="slide-content">
+          <div class="title-slide-content">
+            <div class="title-logo" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle" style="color: var(--emerald-500);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <h1 class="title-h1" style="background: linear-gradient(135deg, #ffffff 30%, var(--emerald-500) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">សូមអរគុណ! / Thank You</h1>
+            <p class="title-subtitle" style="max-width: 600px; font-family: 'Kantumruy Pro', 'Inter', sans-serif;">Thank you for your attention. Feel free to ask any questions regarding our EduTrack Mobile application.<br><span style="color: var(--text-secondary); font-size: 14px;">(សូមអរគុណសម្រាប់ការយកចិត្តទុកដាក់ស្តាប់។ ប្រសិនបើមានសំណួរផ្សេងៗ ទាក់ទងនឹងកម្មវិធី EduTrack Mobile អាចធ្វើការសួរដេញដោលបាន។)</span></p>
+            <div class="title-meta">
+              <span>Presented by (បង្ហាញដោយ): <strong>Vuth Vatana & Soeum Somanika</strong></span>
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>End of Presentation</span>
+            <span class="author">Vuth Vatana • Soeum Somanika</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Speaker Notes Panel -->
+    <div class="speaker-notes" id="speakerNotes">
+      <h3>📝 Speaker Notes</h3>
+      <div id="notesContent"></div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+      <div class="slide-counter">
+        <span class="current" id="currentSlide">1</span> / <span id="totalSlides">13</span>
+      </div>
+
+      <span class="slide-title" id="slideTitle">Title Slide / ទំព័រចំណងជើង</span>
+
+      <div class="progress-container">
+        <div class="progress-fill" id="progressFill" style="width: 7.69%"></div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" disabled title="Previous (←)">◀</button>
+        <button class="nav-btn" id="nextBtn" title="Next (→)">▶</button>
+        <button class="notes-toggle" id="notesToggle" title="Speaker Notes (N)">📝 Notes</button>
+        <button class="nav-btn fullscreen-btn" id="fullscreenBtn" title="Fullscreen (F)">⛶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ───── Slide Speaker Notes Data ─────
+    const slideMeta = [
+      {
+        title: "Title Slide / ទំព័រចំណងជើង",
+        notes: `<ul>
+          <li>សូមគោរព និងជម្រាបសួរលោកគ្រូ និងមិត្តភក្តិទាំងអស់គ្នា! ពួកយើងជាក្រុមអភិវឌ្ឍន៍កម្មវិធី <strong>EduTrack Mobile</strong>។</li>
+          <li>សមាជិកក្រុមរួមមាន៖ <strong>VUTH Vatana</strong> និង <strong>SOEUM Somanika</strong>។</li>
+          <li>គម្រោងនេះជាកម្មវិធីទូរស័ព្ទដៃដែលជួយសិស្សក្នុងការគ្រប់គ្រងព័ត៌មានសិក្សា លទ្ធផល និងកាលវិភាគ។</li>
+        </ul>`
+      },
+      {
+        title: "Agenda / មាតិកា",
+        notes: `<ul>
+          <li>នេះជារបៀបវារៈ ឬមាតិកាសំខាន់ៗចំនួន ១០ ដែលពួកយើងនឹងធ្វើការបង្ហាញជូននៅក្នុង Slide នេះ។</li>
+          <li>យើងនឹងរៀបរាប់លម្អិតពីមុខងារនីមួយៗ ដូចជាការ Login, Register, UI Components ផ្សេងៗ និងការតេស្តភ្ជាប់ទៅកាន់ API ផងដែរ។</li>
+        </ul>`
+      },
+      {
+        title: "Login / ការចូលគណនី",
+        notes: `<ul>
+          <li><strong>Login Screen:</strong> ការពារសុវត្ថិភាពដោយមានប្រព័ន្ធត្រួតពិនិត្យទម្រង់អ៊ីមែល និងតម្រូវឱ្យបំពេញព័ត៌មានចាំបាច់។</li>
+          <li>មុខងារ <code>AuthService.login()</code> នឹងទៅអានឯកសារ <code>accounts.json</code> ក្នុង Local Storage ដើម្បីផ្ទៀងផ្ទាត់។</li>
+          <li>ប្រសិនបើជោគជ័យ វានឹងបញ្ចូលគណនីសិស្សទៅកាន់ <code>AppState</code> ហើយបើកទៅកាន់ Dashboard ភ្លាមៗ។</li>
+        </ul>`
+      },
+      {
+        title: "Register / ការចុះឈ្មោះ",
+        notes: `<ul>
+          <li><strong>Register Screen:</strong> អនុញ្ញាតឱ្យចុះឈ្មោះគណនីថ្មីដោយរក្សាទុកទៅក្នុង Local storage។</li>
+          <li>មាន <strong>Password Strength Meter</strong> ដើម្បីវាស់កម្រិតសុវត្ថិភាពលេខកូដសិស្ស (ធំ តូច លេខ និងនិមិត្តសញ្ញា)។</li>
+          <li>មានការផ្ទៀងផ្ទាត់មិនឱ្យជាន់អ៊ីមែលគ្នា និងសារព្រមានពណ៌ក្រហម (SnackBar) ពេលមានកំហុស។</li>
+        </ul>`
+      },
+      {
+        title: "App Bar / របារផ្នែកខាងលើ",
+        notes: `<ul>
+          <li><strong>App Bar:</strong> រចនាឡើងយ៉ាងសាមញ្ញ គាំទ្រការបកប្រែឈ្មោះកម្មវិធីទៅជាភាសាខ្មែរ/អង់គ្លេសភ្លាមៗ។</li>
+          <li>មានប៊ូតុងបើក Drawer នៅខាងឆ្វេង និងរូបកណ្តឹងជូនដំណឹងដែលមាន Badge បង្ហាញចំនួនសារមិនទាន់អាននៅខាងស្តាំ។</li>
+          <li>តម្លៃ Badge updates តាមរយៈ <code>AppState.unreadNotificationsCount</code>។</li>
+        </ul>`
+      },
+      {
+        title: "Bottom Navigation Bar / របាររុករកខាងក្រោម",
+        notes: `<ul>
+          <li><strong>Bottom Navigation:</strong> ជួយរុករកផ្ទាំងទាំង ៥ (Home, Schedule, Result, Library, Profile)។</li>
+          <li>ប្រើប្រាស់ <code>IndexedStack</code> ដើម្បីកុំឱ្យបាត់បង់ស្ថានភាពទិន្នន័យ (State & Scroll Offset) ពេលចុចប្តូរចុះឡើង។</li>
+          <li>រចនាតាមស្តង់ដារ Material Design 3 មាន Animation ស្រាលៗពេលចុចប្តូរ tab។</li>
+        </ul>`
+      },
+      {
+        title: "Drawer / ម៉ឺនុយចំហៀង",
+        notes: `<ul>
+          <li><strong>Drawer:</strong> របារចំហៀងបង្ហាញព័ត៌មានសង្ខេបរបស់សិស្ស (ឈ្មោះ, ជំនាញ, និងរូបថត)។</li>
+          <li>មានតំណភ្ជាប់រុករកទៅកាន់៖ Assignments, Attendance, Campus Events, Settings, About និង Help។</li>
+          <li>ប៊ូតុង Log Out នឹងលុប Session របស់សិស្សចេញពី <code>AppState</code> ហើយបញ្ជូនត្រឡប់ទៅអេក្រង់ Login វិញ।</li>
+        </ul>`
+      },
+      {
+        title: "Profile & Student ID Card / ព័ត៌មានផ្ទាល់ខ្លួន & កាតសិស្ស",
+        notes: `<ul>
+          <li><strong>Profile:</strong> បង្ហាញកាតសិស្សនិម្មិត (Virtual Student Card) ដ៏ស្រស់ស្អាត។</li>
+          <li>មានប៊ូតុងកែសម្រួលព័ត៌មាន (Edit Profile) ជាទម្រង់ Bottom Sheet សម្រាប់កែឈ្មោះ លេខទូរស័ព្ទ ឬ URL រូបថត។</li>
+          <li>រាល់ការកែប្រែទិន្នន័យ វានឹងធ្វើបច្ចុប្បន្នភាពភ្លាមៗទូទាំងកម្មវិធីតាមរយៈ <code>AppState</code>។</li>
+        </ul>`
+      },
+      {
+        title: "Settings System / ប្រព័ន្ធកំណត់",
+        notes: `<ul>
+          <li><strong>Settings:</strong> អនុញ្ញាតឱ្យសិស្សបិទបើកមុខងារងងឹត (Dark Mode) ដែលកែប្រែ Theme ទាំងមូលភ្លាមៗ។</li>
+          <li>អាចជ្រើសរើសផ្លាស់ប្តូរភាសារវាង ខ្មែរ និង English តាមរយៈ Localization system របស់ AppState។</li>
+          <li>មានមុខងារផ្លាស់ប្តូរលេខកូដសម្ងាត់គណនីថ្មីផងដែរ។</li>
+        </ul>`
+      },
+      {
+        title: "Home Dashboard / ផ្ទាំងព័ត៌មានដើម",
+        notes: `<ul>
+          <li><strong>Dashboard:</strong> ផ្ទាំងកណ្តាលបង្ហាញស្ថិតិសំខាន់ៗដូចជា អត្រាវត្តមាន, GPA សរុប និងកិច្ចការបន្ទាប់។</li>
+          <li>ប្រើប្រាស់ <code>Future.wait</code> ដើម្បីទាញយកទិន្នន័យពី API ច្រើនក្នុងពេលតែមួយ ដើម្បីឱ្យកម្មវិធីរត់លឿនជាងមុន។</li>
+          <li>មាន Action Buttons រុករកលឿន និង Feed បង្ហាញសារជូនដំណឹងថ្មីៗបំផុត។</li>
+        </ul>`
+      },
+      {
+        title: "Notifications / ប្រព័ន្ធជូនដំណឹង",
+        notes: `<ul>
+          <li><strong>Notifications Screen:</strong> បង្ហាញសេចក្តីជូនដំណឹង និងព្រឹត្តិការណ៍នានមកពីសាលា។</li>
+          <li>មានចំណុចពណ៌ខៀវតំណាងឱ្យសារមិនទាន់អាន។ ពេលចុចមើល សារនោះនឹងក្លាយជាអានរួច រួចកាត់បន្ថយចំនួន Badge count លើ App Bar។</li>
+          <li>មានប៊ូតុង "Mark all as read" ដើម្បីសម្គាល់ថាបានអានទាំងអស់ក្នុងពេលតែមួយ។</li>
+        </ul>`
+      },
+      {
+        title: "Call API Test / ការតេស្តភ្ជាប់ API",
+        notes: `<ul>
+          <li><strong>API Fetch Flow:</strong> ការទាញយកទិន្នន័យឆ្លាតវៃ (Unified Fetching)។</li>
+          <li>ដំបូងឡើយវាទាញយកទិន្នន័យ Online ពី GitHub Raw JSON។ បើគ្មានអ៊ីនធឺណិត ឬហួសម៉ោងកំណត់ (Timeout) វានឹងដកស្រង់ឯកសារ Local Asset <code>db.json</code> មកជំនួសវិញ។</li>
+          <li>វាទាញយកបញ្ជីសៀវភៅកុំព្យូទ័រមកពី Open Library API ដោយជោគជ័យ។</li>
+          <li>**ការដោះស្រាយបញ្ហា Release APK:** ក្រុមយើងបានបន្ថែមសិទ្ធិ <code>INTERNET</code> ទៅក្នុង <code>AndroidManifest.xml</code> ដើម្បីឱ្យកម្មវិធីដំណើរការទាញយករូបភាព និងទិន្នន័យបានត្រឹមត្រូវពេលដំឡើងលើទូរស័ព្ទ។</li>
+        </ul>`
+      },
+      {
+        title: "Thank You / សូមអរគុណ!",
+        notes: `<ul>
+          <li>សូមអរគុណលោកគ្រូ និងមិត្តភក្តិទាំងអស់សម្រាប់ការយកចិត្តទុកដាក់ស្តាប់ការបង្ហាញរបស់ក្រុមយើងខ្ញុំ។</li>
+          <li>គម្រោងនេះបង្ហាញពីចំណុចខ្លាំងនៃការប្រើប្រាស់ Flutter ក្នុងការបង្កើត UI/UX កម្រិតខ្ពស់ និងការគ្រប់គ្រង State ប្រកបដោយប្រសិទ្ធភាព។</li>
+          <li>ប្រសិនបើមានសំណួរ ឬមតិស្ថាបនាបន្ថែម សូមធ្វើការសាកសួរមកកាន់ក្រុមយើងខ្ញុំបាន!</li>
+        </ul>`
+      }
+    ];
+
+    // ───── State ─────
+    let currentIndex = 0;
+    const totalSlides = slideMeta.length;
+    let notesOpen = false;
+
+    // ───── DOM ─────
+    const slides = document.querySelectorAll('.slide');
+    const currentEl = document.getElementById('currentSlide');
+    const totalEl = document.getElementById('totalSlides');
+    const progressFill = document.getElementById('progressFill');
+    const slideTitle = document.getElementById('slideTitle');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const notesToggle = document.getElementById('notesToggle');
+    const speakerNotes = document.getElementById('speakerNotes');
+    const notesContent = document.getElementById('notesContent');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const keyboardHint = document.getElementById('keyboardHint');
+
+    totalEl.textContent = totalSlides;
+
+    // ───── Navigation ─────
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+
+      const prevSlide = slides[currentIndex];
+      const nextSlide = slides[index];
+
+      // Transition effects
+      if (index > currentIndex) {
+        prevSlide.classList.remove('active');
+        prevSlide.classList.add('exit-left');
+      } else {
+        prevSlide.classList.remove('active');
+        prevSlide.style.transform = 'scale(0.95) translateX(60px)';
+        prevSlide.style.opacity = '0';
+      }
+
+      setTimeout(() => {
+        prevSlide.classList.remove('exit-left');
+        prevSlide.style.transform = '';
+        prevSlide.style.opacity = '';
+      }, 600);
+
+      currentIndex = index;
+      nextSlide.classList.add('active');
+
+      // Update UI
+      currentEl.textContent = currentIndex + 1;
+      progressFill.style.width = ((currentIndex + 1) / totalSlides * 100) + '%';
+      slideTitle.textContent = slideMeta[currentIndex].title;
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === totalSlides - 1;
+
+      // Update notes
+      notesContent.innerHTML = slideMeta[currentIndex].notes;
+    }
+
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function prevSlide() { goToSlide(currentIndex - 1); }
+
+    // ───── Events ─────
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    notesToggle.addEventListener('click', () => {
+      notesOpen = !notesOpen;
+      speakerNotes.classList.toggle('open', notesOpen);
+      notesToggle.classList.toggle('active', notesOpen);
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Click on slide viewport sides to navigate
+    document.getElementById('slideViewport').addEventListener('click', (e) => {
+      // Don't trigger if clicked on mock interactions or notes
+      if (e.target.closest('.mock-phone') || e.target.closest('.mock-btn') || e.target.closest('.slide-bullets')) return;
+      
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if (x < rect.width / 3) {
+        prevSlide();
+      } else {
+        nextSlide();
+      }
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowRight':
+        case ' ':
+        case 'PageDown':
+          e.preventDefault();
+          nextSlide();
+          break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          prevSlide();
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToSlide(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToSlide(totalSlides - 1);
+          break;
+        case 'f':
+        case 'F':
+          fullscreenBtn.click();
+          break;
+        case 'n':
+        case 'N':
+          notesToggle.click();
+          break;
+        case 'Escape':
+          if (notesOpen) {
+            notesToggle.click();
+          }
+          break;
+      }
+    });
+
+    // Touch / Swipe support
+    let touchStartX = 0;
+    document.getElementById('slideViewport').addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.getElementById('slideViewport').addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) {
+        diff > 0 ? nextSlide() : prevSlide();
+      }
+    }, { passive: true });
+
+    // Hide keyboard hint after 6s
+    setTimeout(() => {
+      keyboardHint.style.opacity = '0';
+      setTimeout(() => keyboardHint.style.display = 'none', 500);
+    }, 6000);
+
+    // Initialize
+    notesContent.innerHTML = slideMeta[0].notes;
+  </script>
+</body>
+</html>

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:project_flutter/models/student.dart';
 import 'package:project_flutter/models/notification.dart';
 import 'package:project_flutter/models/assignment.dart';
@@ -9,6 +11,42 @@ import 'package:project_flutter/models/borrowed_book.dart';
 enum AppLanguage { english, khmer }
 
 class AppState extends ChangeNotifier {
+  final SharedPreferences _prefs;
+
+  AppState(this._prefs) {
+    _loadFromPrefs();
+  }
+
+  void _loadFromPrefs() {
+    // 1. Load active student
+    final studentStr = _prefs.getString('current_student');
+    if (studentStr != null) {
+      try {
+        _currentStudent = Student.fromJson(jsonDecode(studentStr) as Map<String, dynamic>);
+      } catch (e) {
+        debugPrint('Error decoding student: $e');
+      }
+    }
+
+    // 2. Load theme mode
+    final themeStr = _prefs.getString('theme_mode');
+    if (themeStr != null) {
+      _themeMode = ThemeMode.values.firstWhere(
+        (t) => t.name == themeStr,
+        orElse: () => ThemeMode.light,
+      );
+    }
+
+    // 3. Load language
+    final langStr = _prefs.getString('language');
+    if (langStr != null) {
+      _language = AppLanguage.values.firstWhere(
+        (l) => l.name == langStr,
+        orElse: () => AppLanguage.english,
+      );
+    }
+  }
+
   // Theme State
   ThemeMode _themeMode = ThemeMode.light;
   ThemeMode get themeMode => _themeMode;
@@ -17,6 +55,7 @@ class AppState extends ChangeNotifier {
 
   void toggleTheme(bool isOn) {
     _themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
+    _prefs.setString('theme_mode', _themeMode.name);
     notifyListeners();
   }
 
@@ -26,6 +65,7 @@ class AppState extends ChangeNotifier {
 
   void setLanguage(AppLanguage lang) {
     _language = lang;
+    _prefs.setString('language', _language.name);
     notifyListeners();
   }
 
@@ -35,11 +75,13 @@ class AppState extends ChangeNotifier {
 
   void loginStudent(Student student) {
     _currentStudent = student;
+    _prefs.setString('current_student', jsonEncode(student.toJson()));
     notifyListeners();
   }
 
   void logoutStudent() {
     _currentStudent = null;
+    _prefs.remove('current_student');
     notifyListeners();
   }
 
@@ -50,6 +92,7 @@ class AppState extends ChangeNotifier {
         phoneNumber: phoneNumber,
         avatarUrl: avatarUrl,
       );
+      _prefs.setString('current_student', jsonEncode(_currentStudent!.toJson()));
       notifyListeners();
     }
   }
